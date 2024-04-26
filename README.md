@@ -128,8 +128,9 @@ erDiagram
 | GET /login    | AuthController::getLoginForm    | 200 LoginForm | Render the login form                                  |
 | POST /login    | AuthController::login | 200 Search | Logs a user in and authenticates and redirects to search page                                |
 | GET /logout | AuthController::logout | 200 Login      | Log out and redirect to login page |
+| GET /linkaccount | AuthController::linkaccount | 200 Stats | Link a game platform account and redirect to respective stats |
 
-### Task Management
+### Search and Stats Retrieval
 
 | Request                                   | Action                     | Response                 | Description                        |
 | ----------------------------------------- | -------------------------- | ------------------------ | ---------------------------------- |
