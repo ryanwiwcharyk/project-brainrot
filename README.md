@@ -2,160 +2,132 @@ Your [project](https://vikramsinghmtl.github.io/420-4W6-Web-Programming-II/proje
 
 ---
 
-![Banner](images/collab.png)
+![Banner](./images/230558.jpg)
 
-Introducing "Taskr" – a collaborative task management platform where teams, families, or study groups can manage shared projects and hold each other accountable. This app is for:
+Welcome to **Project Brainrot** – a simple, yet effective and detailed news, statistics, and content tracker for the massively multiplayer online battle royale "Apex Legends". This app is targeted towards the 18 **million** monthly active players, offering:
 
--   Small teams and project groups needing a lightweight way to coordinate tasks.
--   Households or roommates looking to organize shared chores and responsibilities.
--   Students working on group assignments.
+-   A detailed platform profile lookup and statistics dashboard.
+-   Current map rotations, store offerings, and news updates.
+-   Accurate and up to date profile stats, with the ability to link platform accounts for fast stats lookup, and favourited profiles.
 
-Many existing task managers are overly complex for small-scale collaboration or lack features to foster a sense of shared ownership. Taskr aims to bridge the gap, providing the right balance of structure and simplicity for coordination.
+
+Despite the several existing stats trackers, dahsboards and profile lookups, many of them offer convoluted search processes, inaccurate data and low functionality. 
 
 ## 🧱 Core Functionality
 
--   **Project Creation:** Users can create new shared projects with a title and basic description.
--   **User Management:** Users can join existing projects using a unique project code.
--   **Task Management:** Within a project, users can:
-    -   Create new tasks with descriptions and due dates.
-    -   Assign tasks to specific project members.
-    -   Mark tasks as completed.
--   **Basic Notifications:** Users receive notifications when assigned a task or when a task they're involved in is marked complete.
--   **In-Task Chat:** Simple comment threads attached to tasks for focused discussions.
--   **Custom Task Statuses:** Ability to define statuses beyond "Not Started" and "Completed" (e.g., "In Progress", "Blocked")
+-   **Profile Lookup:** Users can search for any user by specifying platform and platofrm user name.
+-   **Account Linking:** Users can link their game platform account to the site account to get quick and easy statistics.
+-   **Profile Favouriting:** Users can opt to favourite frequently looked up profiles, either friends or enemies, for fast and easy profile lookups.
+-   **Up-To-Date News:** A dedicated page displaying store contents and offerings, as well as map rotations and in game news.
+-   **Session Stats:** Stats broken up by session for easy tracking of player progression through across multiple sessions.
 
 ### Requirements
 
-#### Task Stories
+#### Profile Lookup
 
--   As a user, I want to create a task so that I can keep track of what I have to get done.
--   As a user, I want to view my tasks in a list so I can see what needs my attention.
--   As a user, I want to edit a task to update its details or due date.
--   As a user, I want to mark a task as complete so I can track my progress.
--   As a user, I want to delete a task when it's no longer relevant.
+-   As a user, I want to be able to specify a profiles platform to simplify lookups.
+-   As a user, I want to be able to specify a user's platform username so I can find exactly who I am looking for.
 
-#### Project Stories
+#### Favourites Stories
 
--   As a user, I want to create a new project so I can organize a set of related tasks.
--   As a user, I want to join a project using an invite code so I can collaborate with others.
--   As a user, I want to view all projects I'm part of to easily switch between them.
+-   As a user, I want to favourite a profile that I frequently visit to acces my own and my friends' stats easier.
+-   As a user, I want to be able to easily and intuitively access my favourited profiles.
 
 #### User Management Stories
 
 -   As a user, I want to register for an account so I can start using the app.
--   As a user, I want to log in to my account to access my tasks and projects.
+-   As a user, I want to log in to my account to access my stats and favourites.
 -   As a user, I want to log out of my account to securely end my session.
+-   As a user, I want to link my game platform account to facilitate the retrieval of my stats.
 
-#### Comment Stories
+#### News/Updates Stories
 
--   As a user, I want to leave a comment on a task to ask for clarification or provide an update.
--   As a user, I want to see comments from other team members on a task to stay on the same page.
--   As a user, I want to be notified if there's a new comment on a task I'm involved with.
-
-#### Status Stories
-
--   As a user, I want to mark a task as "In Progress" to signal that I'm actively working on it.
--   As a user, I want to mark a task as "Blocked" to indicate that I can't proceed due to a dependency.
--   As a user, I want to view tasks grouped by their status to get a quick overview of the project's health.
+-   As a user, I want to be able to intuitively access and see upcoming map rotations.
+-   As a user, I want to be able to easily access store offerings relative to me.
+-   As a user, I want to be able to stay up to date and see currently unfolding game news.
 
 ## ᛦ Entity Relationships
 
->[!note]
-> If you view the source code for this README file, you'll see the Mermaid syntax that generated the following diagram. You can copy the code into the [live Mermaid editor](https://mermaid.live) to play around and make changes specific to your app.
 
 ```mermaid
 erDiagram
-    PROJECT ||--o{ TASK : contains
-    PROJECT ||--o{ USER_PROJECT : "is managed by"
-    USER |o--o{ TASK : "assigned to"
-    USER ||--o{ USER_PROJECT : "works on"
-    TASK ||--o{ SUBTASK : has
-    TASK ||--o{ NOTIFICATION: emits
-    TASK ||--o{ COMMENT: has
-    USER ||--o{ COMMENT: writes
-    NOTIFICATION ||--o{ USER_NOTIFICATION: pings
-    USER ||--o{ USER_NOTIFICATION: receives
+        User ||--|| Game_Profile: has
+    Game_Profile ||--|| Stats: has
+    Game_Profile }o--|| Platform: "is on"
+    Game_Profile }o--o{ Favourites: has
+    Game_Profile ||--o{ Session: has
+    User ||--o{ Favourites: has
 
-    USER_PROJECT {
-        int user_id PK, FK
-        int project_id PK, FK
-    }
 
-    TASK {
-        int id PK
-        string title
-        string description
-        enum status "complete | in progress | unassigned | blocked"
-        date created_at
-        date edited_at
-        int project_id FK
-        int assignee FK
-    }
-
-    SUBTASK {
-        int id PK
-        string title
-        date created_at
-        date edited_at
-        int task_id FK
-    }
-
-    PROJECT {
-        int id PK
-        string title
-        string description
-        date created_at
-        date edited_at
-    }
-
-    USER {
-        int id PK
-        string email
+    User {
+        int user_ID PK
+        int profile_ID FK
         string name
-        date created_at
-        date edited_at
+        string email
+        string password
+        string created_at
+        string edited_at
+        string profile_picture
     }
-
-    COMMENT {
-        int id PK
-        string content
-        date created_at
-        date edited_at
-        id user_id FK "comment author"
-        id task_id FK
+    Favourites{
+        int user_Id PK,FK
+        int profile_ID PK,FK
     }
-
-    NOTIFICATION {
-        int id PK
-        string content
-        date created_at
-        id task_id FK
+    Game_Profile{
+        int profile_ID PK
+        string platform_ID FK
+        string username
+        bool online
     }
-
-    USER_NOTIFICATION {
-        int user_id PK, FK
-        int notification_id PK, FK
+    Platform{
+        string platform_ID PK
+        string platform_name
+    }
+    Stats {
+        int stats_ID PK
+        int profile_ID FK
+        int level
+        int total_kills
+        int total_deaths
+        int KD
+        int total_damage
+        int total_wins
+        string rank
+        int party_space
+    }
+    Session{
+        int session_ID PK
+        int profile_ID FK
+        date start_time
+        date end_time
+        int games_played
+        int kills
+        int deaths
+        int KD
+    }
+    Map{
+        int time_for_next_map
+        string map_name
+        string map_img
     }
 ```
 
 -   **Authentication System:** Handling user registration, login, logout, and session management.
--   **Project Management:** Logic for project creation, joining projects, and CRUD operations on projects.
--   **Task Management:** Logic for task creation, assignment, updates, filtering, and notifications.
--   **UI Elements:** Design of forms, task lists, project overview, notification lists.
+-   **Profile Management:** Logic for profile lookups, stats retrieval, and CRUD operations on stats and users.
+-   **Favouriting Management:** Logic for profile favouriting and retrieval, assignment, updates, filtering, and notifications.
+-   **UI Elements:** Design of forms, stats displays, project overview, favouriting list.
 
 ## 📍 API Routes
 
->[!note]
-> These are only a few routes to give you an idea, these would definitely not be all the routes for this kind of app!
 
-### Project Management
+### User Management
 
 | Request              | Action                           | Response              | Description                                                             |
 | -------------------- | -------------------------------- | --------------------- | ----------------------------------------------------------------------- |
-| POST /projects       | ProjectController::createProject | 201 /projects/:id     | Create a new project and redirect to the project's view                 |
-| GET /projects/:id    | ProjectController::getProject    | 200 ProjectDetailView | Retrieve details of a specific project                                  |
-| PUT /projects/:id    | ProjectController::updateProject | 200 ProjectDetailView | Update an existing project's information                                |
-| DELETE /projects/:id | ProjectController::deleteProject | 204 (No Content)      | Delete a project (consider implications – should tasks be deleted too?) |
+| GET /register       | AuthController::getRegistrationForm | 201 /login     | Create a new user and redirect to the login page                |
+| GET /login    | AuthController::getLoginForm    | 200 LoginForm | Render the login form                                  |
+| POST /login    | AuthController::login | 200 Search | Logs a user in and authenticates and redirects to search page                                |
+| GET /logout | AuthController::logout | 200 Login      | Log out and redirect to login page |
 
 ### Task Management
 
