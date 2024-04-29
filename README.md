@@ -124,38 +124,40 @@ erDiagram
 
 | Request              | Action                           | Response              | Description                                                             |
 | -------------------- | -------------------------------- | --------------------- | ----------------------------------------------------------------------- |
-| GET /register       | AuthController::getRegistrationForm | 201 /login     | Create a new user and redirect to the login page                |
-| GET /login    | AuthController::getLoginForm    | 200 LoginForm | Render the login form                                  |
-| POST /login    | AuthController::login | 200 Search | Logs a user in and authenticates and redirects to search page                                |
-| GET /logout | AuthController::logout | 200 Login      | Log out and redirect to login page |
-| GET /linkaccount | AuthController::linkaccount | 200 Stats | Link a game platform account and redirect to respective stats |
+| GET /register       | AuthController::getRegistrationForm | 200 RegistrationForm | Render the registration form |
+| GET /login    | AuthController::getLoginForm | 200 LoginForm | Render the login form |
+| POST /login    | AuthController::login | 200 /search | Logs a user in and redirects to search page |
+| GET /logout | AuthController::logout | 200 LoginForm | Log out and redirect to login page |
+| POST /user | UserController::createUser | 201 /login | Creates the user and redirects to the login page |
+| GET /user/edit | UserController::getUserPage | 200 EditProfileView | Renders the profile page |
+| PUT /user/edit | UserController::updateUser | 200 /user/edit | Updates the users profile |
 
 ### Search and Stats Retrieval
 
 | Request                                   | Action                     | Response                 | Description                        |
 | ----------------------------------------- | -------------------------- | ------------------------ | ---------------------------------- |
-| POST /projects/:projectId/tasks           | TaskController::createTask | 201 /projects/:projectId | Create a new task within a project |
-| GET /projects/:projectId/tasks/:taskId    | TaskController::getTask    | 200 TaskDetailView       | Retrieve a specific task's details |
-| PUT /projects/:projectId/tasks/:taskId    | TaskController::updateTask | 200 TaskDetailView       | Edit an existing task              |
-| DELETE /projects/:projectId/tasks/:taskId | TaskController::deleteTask | 204 (No Content)         | Delete a task                      |
+| GET /stats/:username    | StatsController::getStatisticsPage    | 200 StatView       | Render the statistic page |
+| POST /search | SearchController::findPlayerStatistics | 200  /stats/:username | Retrieve a specific players in game statistics |
+| GET /search | SearchController::getSearchForm | 200 SearchForm | Render the registration form | 
 
 ## 📐 Wireframes
 
->[!note]
-> Don't go crazy detailed with the wireframes! These should be minimal sketches to convey to the customer what the app will roughly look like. These things tend to change over time as requirements evolve, but you need to start from somewhere.
 
-![Login View](images/login-view.png)
+![Login View](images/Login.png)
 
-The login view is the initial screen where users can enter their credentials to log into their account. It typically consists of a form with input fields for the username/email and password, along with a "Login" button. The login view should also include a link to the registration page for new users who don't have an account yet.
+The login view is the initial screen where users can enter their credentials to log into their account. It consists of a form with input fields for the email and password, along with a "Login" button. The login view also includes a link to the registration page for new users who don't have an account yet.
 
-![List View](images/list-view.png)
+![Register View](images/Register.png)
 
-All the tasks for the logged in user where they can sort by title, due date, and created date. They can also filter tasks to only see completed or uncompleted tasks. The user can check off tasks here, or if they want a more detailed view, can click on one of the tasks (see next view).
+The register view is the screen where users can enter in credentials to create an account on our site. It consists of email and password, along with a link to the login page for existing users.
 
-![Show View](images/show-view.png)
+![Profile View](images/Profile.png)
 
-This view shows the user more details for one specific task. If a due date was set, it will tell them how many days from now the task is due. There is a description field to provide more context for the task, as well as task actions to mark the task as complete, edit the task, or delete. On the right we have a sub-task list so that the user can breakdown the task steps even further. The sub-tasks can be checked off when completed.
+The user profile shows the user's profile picture if set, and gives them a place where they can update their email, password and profile picture. 
 
-![Profile View](images/profile-view.png)
+![Search View](images/Seach.png)
+The serach view allows the user to find a player's statistics by searching for them in our database. This consists of a form with input fields for the username and the platform that user can be found on.
 
-The user profile shows the user's profile picture if set, and gives them a place where they can update their email and password. Here is also where they can control if the site is displayed in light or dark mode depending on the value of the toggle switch.
+![Stats View](images/Stats.png)
+
+This view shows the user more details for their found player. It will give them all relevent statistics they would need. Such as the accounts total kills, deaths, damage, wins along with their kill to death ration, player level, rank and if they player is currently online.

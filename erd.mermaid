@@ -1,72 +1,60 @@
 erDiagram
-    PROJECT ||--o{ TASK : contains
-    PROJECT ||--o{ USER_PROJECT : "is managed by"
-    USER |o--o{ TASK : "assigned to"
-    USER ||--o{ USER_PROJECT : "works on"
-    TASK ||--o{ SUBTASK : has
-    TASK ||--o{ NOTIFICATION: emits
-    TASK ||--o{ COMMENT: has
-    USER ||--o{ COMMENT: writes
-    NOTIFICATION ||--o{ USER_NOTIFICATION: pings
-    USER ||--o{ USER_NOTIFICATION: receives
+    User ||--|| Game_Profile: has
+    Game_Profile ||--|| Stats: has
+    Game_Profile }o--|| Platform: "is on"
+    Game_Profile }o--o{ Favourites: has
+    Game_Profile ||--o{ Session: has
+    User ||--o{ Favourites: has
 
-    USER_PROJECT {
-        int user_id PK, FK
-        int project_id PK, FK
-    }
 
-    TASK {
-        int id PK
-        string title
-        string description
-        enum status "complete | in progress | unassigned | blocked"
-        date created_at
-        date edited_at
-        int project_id FK
-        int assignee FK
-    }
-
-    SUBTASK {
-        int id PK
-        string title
-        date created_at
-        date edited_at
-        int task_id FK
-    }
-
-    PROJECT {
-        int id PK
-        string title
-        string description
-        date created_at
-        date edited_at
-    }
-
-    USER {
-        int id PK
-        string email
+    User {
+        int user_ID PK
+        int profile_ID FK
         string name
-        date created_at
-        date edited_at
+        string email
+        string password
+        string created_at
+        string edited_at
+        string profile_picture
     }
-
-    COMMENT {
-        int id PK
-        string content
-        date created_at
-        date edited_at
-        id user_id FK "comment author"
-        id task_id FK
+    Favourites{
+        int user_Id PK,FK
+        int profile_ID PK,FK
     }
-
-    NOTIFICATION {
-        int id PK
-        string content
-        date created_at
-        id task_id FK
+    Game_Profile{
+        int profile_ID PK
+        string platform_ID FK
+        string username
+        bool online
     }
-
-    USER_NOTIFICATION {
-        int user_id PK, FK
-        int notification_id PK, FK
+    Platform{
+        string platform_ID PK
+        string platform_name
+    }
+    Stats {
+        int stats_ID PK
+        int profile_ID FK
+        int level
+        int total_kills
+        int total_deaths
+        int KD
+        int total_damage
+        int total_wins
+        string rank
+        int party_space
+    }
+    Session{
+        int session_ID PK
+        int profile_ID FK
+        date start_time
+        date end_time
+        int games_played
+        int kills
+        int deaths
+        int KD
+    }
+    Map{
+        int time_for_next_map
+        string map_name
+        string map_img
     }
