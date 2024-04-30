@@ -63,8 +63,8 @@ erDiagram
         string name
         string email
         string password
-        string created_at
-        string edited_at
+        date created_at
+        date edited_at
         string profile_picture
     }
     Favourites{
@@ -78,7 +78,7 @@ erDiagram
         bool online
     }
     Platform{
-        string platform_ID PK
+        int platform_ID PK
         string platform_name
     }
     Stats {
@@ -87,11 +87,10 @@ erDiagram
         int level
         int total_kills
         int total_deaths
-        int KD
+        decimal KD
         int total_damage
         int total_wins
         string rank
-        int party_space
     }
     Session{
         int session_ID PK
@@ -101,7 +100,7 @@ erDiagram
         int games_played
         int kills
         int deaths
-        int KD
+        decimal KD
     }
     Map{
         int time_for_next_map
@@ -125,10 +124,13 @@ erDiagram
 | GET /register       | AuthController::getRegistrationForm | 200 RegistrationForm | Render the registration form |
 | GET /login    | AuthController::getLoginForm | 200 LoginForm | Render the login form |
 | POST /login    | AuthController::login | 200 /search | Logs a user in and redirects to search page |
+| POST /login    | AuthController::login | 400 /search | Badrequest if user inputs invalid information |
 | GET /logout | AuthController::logout | 200 LoginForm | Log out and redirect to login page |
 | POST /user | UserController::createUser | 201 /login | Creates the user and redirects to the login page |
+| POST /user | UserController::createUser | 400 /register | Badrequest if the user inputs invalid information |
 | GET /user/edit | UserController::getUserPage | 200 EditProfileView | Renders the profile page |
 | PUT /user/edit | UserController::updateUser | 200 /user/edit | Updates the users profile |
+| PUT /user/edit | UserController::updateUser | 400 /user/edit | Badrequest if user inputs invalid information |
 
 ### Search and Stats Retrieval
 
@@ -136,6 +138,7 @@ erDiagram
 | ----------------------------------------- | -------------------------- | ------------------------ | ---------------------------------- |
 | GET /stats/:username    | StatsController::getStatisticsPage    | 200 StatView       | Render the statistic page |
 | POST /search | SearchController::findPlayerStatistics | 200  /stats/:username | Retrieve a specific players in game statistics |
+| POST /search | SearchController::findPlayerStatistics | 404  /search | Not found if the player's username doesn't exist |
 | GET /search | SearchController::getSearchForm | 200 SearchForm | Render the registration form | 
 
 ## 📐 Wireframes
