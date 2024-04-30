@@ -1,6 +1,4 @@
-Your [project](https://vikramsinghmtl.github.io/420-4W6-Web-Programming-II/project/specifications) proposal will go here. Since you have to write your proposal in markdown, I've provided the sample proposal below so you have a reference for the syntax. Don't worry about getting rid of my stuff below since there's the live [sample proposal](https://vikramsinghmtl.github.io/420-4W6-Web-Programming-II/project/example-proposal) copy on the notes website.
 
----
 
 ![Banner](./images/230558.jpg)
 
@@ -160,4 +158,4 @@ The serach view allows the user to find a player's statistics by searching for t
 
 ![Stats View](images/Stats.png)
 
-This view shows the user more details for their found player. It will give them all relevent statistics they would need. Such as the accounts total kills, deaths, damage, wins along with their kill to death ration, player level, rank and if they player is currently online.
+This view shows the user more details for their found player. It will give them all relevent statistics they would need. Such as the accounts total kills, deaths, damage, wins along with their kill to death ratio, player level, rank and if they player is currently online.
