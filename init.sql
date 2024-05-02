@@ -3,6 +3,8 @@ CREATE DATABASE "UserStats";
 
 \c UserStats;
 
+-- Beware of drop table, when we start creating accounts and saving them we want to remove these
+-- TODO: Remove drop Table
 DROP TABLE IF EXISTS platform;
 CREATE TABLE platform (
     id SERIAL PRIMARY KEY,

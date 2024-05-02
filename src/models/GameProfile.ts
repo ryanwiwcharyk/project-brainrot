@@ -8,14 +8,9 @@ import {
 
 export interface ProfileProps {
 	id?: number;
-	title: string;
-	description: string;
-	status: "incomplete" | "complete";
-	dueAt?: Date;
-	createdAt: Date;
-	completedAt?: Date;
-	editedAt?: Date;
-	userId: number;
+	username: string;
+	isOnline: boolean;
+	platformId: number;
 }
 
 export default class Profile {
