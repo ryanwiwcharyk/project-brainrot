@@ -102,11 +102,6 @@ erDiagram
         int deaths
         decimal KD
     }
-    Map{
-        int time_for_next_map
-        string map_name
-        string map_img
-    }
 ```
 
 -   **Authentication System:** Handling user registration, login, logout, and session management.
