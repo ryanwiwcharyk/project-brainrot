@@ -25,5 +25,14 @@ export default class Controller {
 	 */
 	registerRoutes(router: Router) {
 		// Any routes that include a `:id` parameter should be registered last.
+		router.get("/", this.getHome)
+	}
+
+	getHome = async (req: Request, res: Response) => {
+		await res.send({
+			statusCode: StatusCode.OK,
+			message: "ok",
+			template: "HomeView"
+		})
 	}
 }
