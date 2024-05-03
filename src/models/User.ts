@@ -5,6 +5,8 @@ import {
 	createUTCDate,
 	snakeToCamel,
 } from "../utils";
+import GameProfile, { ProfileProps } from "./GameProfile";
+
 
 export interface UserProps {
 	id?: number;
@@ -32,7 +34,7 @@ export default class User {
 	constructor(
 		private sql: postgres.Sql<any>,
 		public props: UserProps,
-	) {}
+	) { }
 
 	static async login(
 		sql: postgres.Sql<any>,
@@ -41,7 +43,7 @@ export default class User {
 	): Promise<User> {
 		const connection = await sql.reserve();
 
-		if(!email || !password){
+		if (!email || !password) {
 			throw new InvalidCredentialsError()
 		}
 
@@ -50,10 +52,10 @@ export default class User {
 			WHERE email = ${email} AND password = ${password}
 			`;
 
-		if(row){
+		if (row) {
 			return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
 		}
-		else{
+		else {
 			throw new InvalidCredentialsError()
 		}
 	}
@@ -77,17 +79,17 @@ export default class User {
 			${sql(convertToCase(camelToSnake, props))}
 			RETURNING *
 			`;
-			
+
 			await connection.release();
-			
+
 			return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
 		}
-		else{
+		else {
 			throw new DuplicateEmailError();
 		}
 
 	}
-	static async update(
+	async update(
 		sql: postgres.Sql<any>,
 		updateProps: Partial<UserProps>,
 		id: number
@@ -107,20 +109,74 @@ export default class User {
 		await connection.release();
 
 		return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
-	
+
 	}
 
-	// static async read(sql: postgres.Sql<any>, id: number): Promise<User> {
-	// 	return new User(sql, {});
-	// }
+	static async read(sql: postgres.Sql<any>, id: number) {
+		const connection = await sql.reserve();
 
-	// static async readAll(sql: postgres.Sql<any>): Promise<User[]> {
-	// 	return [new User(sql, {})];
-	// }
+		const [row] = await connection<UserProps[]>`
+			SELECT * FROM
+			users WHERE id = ${id}
+		`;
 
-	// async update(updateProps: Partial<UserProps>) {
-	// }
+		await connection.release();
 
-	// async delete() {
-	// }
+		if (!row) {
+			return null;
+		}
+
+		return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
+	}
+
+	async delete(
+		sql: postgres.Sql<any>,
+		id: number
+	) {
+		const connection = await sql.reserve();
+
+		const [row] = await connection`
+		DELETE FROM users WHERE id = ${id}
+		`;
+
+		await connection.release();
+
+	}
+
+	static async FavouritesReadAll(
+		sql: postgres.Sql<any>,
+		userId: number
+	): Promise<GameProfile[]> {
+		const connection = await sql.reserve();
+
+		const rows: postgres.RowList<ProfileProps[]> = await connection<ProfileProps[]>`
+			SELECT gp.*
+			FROM favourites f JOIN game_profile gp
+            WHERE f.user_id = ${userId} AND f.profile_id = gp.id
+		`;
+
+		await connection.release();
+
+		return rows.map(
+			(row: ProfileProps) =>
+				new GameProfile(sql, convertToCase(snakeToCamel, row) as ProfileProps),
+		);
+	}
+
+	static async FavouritesCreate(
+		sql: postgres.Sql<any>,
+		userId: number,
+		profileId: number,
+	) {
+		const connection = await sql.reserve();
+
+
+		const [row] = await connection<UserProps[]>`
+			INSERT INTO favourites
+			VALUES(${userId}, ${profileId})
+		`;
+
+		await connection.release();
+
+	}
 }

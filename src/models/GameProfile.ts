@@ -13,6 +13,7 @@ export interface ProfileProps {
 	platformId: number;
 }
 
+
 export default class Profile {
 	constructor(
 		private sql: postgres.Sql<any>,
