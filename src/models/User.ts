@@ -179,4 +179,20 @@ export default class User {
 		await connection.release();
 
 	}
+	static async FavouritesDelete(
+		sql: postgres.Sql<any>,
+		userId: number,
+		profileId: number,
+	) {
+		const connection = await sql.reserve();
+
+
+		const [row] = await connection<UserProps[]>`
+			DELETE FROM favourites
+			WHERE user_id = ${userId} AND profile_id = ${profileId}
+		`;
+
+		await connection.release();
+
+	}
 }
