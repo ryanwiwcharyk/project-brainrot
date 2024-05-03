@@ -8,19 +8,24 @@ body {
     color: #263238;
   }  
 
-nav {
+#nav-header {
     display: flex; /* 1 */
     justify-content: space-between; /* 2 */
     padding: 1rem 2rem; /* 3 */
-    background: #cfd8dc; /* 4 */
+    background: rgb(4, 10, 45); /* 4 */
   }
   
-  nav ul {
+  #nav-header ul {
     display: flex; /* 5 */
     list-style: none; /* 6 */
   }
   
-  nav li {
+  #nav-header li {
     padding-left: 1rem; /* 7! */
+  }
+
+  #logo {
+    width: 25px;
+    height: 25px;
   }
   
