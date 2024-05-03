@@ -23,4 +23,9 @@ nav {
   nav li {
     padding-left: 1rem; /* 7! */
   }
+
+  #logo {
+    width: 10;
+    height: 10;
+  }
   
