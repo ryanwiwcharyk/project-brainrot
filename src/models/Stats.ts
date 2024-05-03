@@ -24,6 +24,23 @@ export default class Stats {
 		public props: StatsProps,
 	) {}
 
+	static async create(
+		sql: postgres.Sql<any>,
+		props: StatsProps,
+	) {
+		const connection = await sql.reserve();
+
+
+		const [row] = await connection<StatsProps[]>`
+			INSERT INTO users
+			${sql(convertToCase(camelToSnake, props))}
+			RETURNING *
+			`;
+
+		await connection.release();
+
+	}
+
     static async read(
         sql: postgres.Sql<any>, 
         id: number
