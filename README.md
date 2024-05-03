@@ -52,9 +52,9 @@ erDiagram
         User ||--|| Game_Profile: has
     Game_Profile ||--|| Stats: has
     Game_Profile }o--|| Platform: "is on"
-    Game_Profile }o--o{ Favourites: has
     Game_Profile ||--o{ Session: has
-    User ||--o{ Favourites: has
+    Game_Profile }o--o{ Favourites: has
+    Favourites }o--|| User: has
 
 
     User {
