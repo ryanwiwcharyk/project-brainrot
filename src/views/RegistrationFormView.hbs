@@ -1,0 +1,25 @@
+{{> Header }}
+
+<h1>Register</h1>
+
+{{#if error}}
+<p id="error"> {{error}}</p>
+{{/if}}
+<form method="POST" action="/users" id="register-form">
+	
+		<label>
+			Email
+			<input type="text" name="email">
+		</label> <br>
+        <label>
+            Password
+            <input type="text" name="password">
+        </label> <br>
+        <label>
+            Confirm Password
+            <input type="text" name="confirmPassword">
+        </label><br>
+	
+	<input type="submit" value="Create" id="register-form-submit-button">
+</form>
+{{> Footer}}

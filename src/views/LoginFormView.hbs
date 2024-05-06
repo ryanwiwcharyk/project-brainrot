@@ -1,0 +1,31 @@
+{{> Header}}
+
+{{#if error}}
+<p id="error"> {{error}}</p>
+{{/if}}
+
+<form method="POST" action="/login" id="login-form">
+		
+		{{#if emailCookie}}
+		<label>
+			Email
+			<input type="text" name="email" value="{{emailCookie}}">
+		</label> <br>
+		{{else}}
+		<label>
+			Email
+			<input type="text" name="email">
+		</label> <br>
+		{{/if}}
+        <label>
+            Password
+            <input type="text" name="password">
+        </label> <br>
+
+		<input id="remember" type="checkbox" name="remember">
+  		<label for="remember"> Remember me</label><br>
+	
+	<input type="submit" value="Login" id="login-form-submit-button">
+</form>
+
+{{> Footer}}
