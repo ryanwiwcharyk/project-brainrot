@@ -32,7 +32,7 @@ export default class Stats {
 
 
 		const [row] = await connection<StatsProps[]>`
-			INSERT INTO users
+			INSERT INTO stats
 			${sql(convertToCase(camelToSnake, props))}
 			RETURNING *
 			`;
@@ -70,7 +70,7 @@ export default class Stats {
 		const [row] = await connection`
 		UPDATE stats
 		SET
-			${sql(convertToCase(camelToSnake, updateProps))}, edited_at = ${createUTCDate()}
+			${sql(convertToCase(camelToSnake, updateProps))}
 		WHERE
 			id = ${id}
 		RETURNING *
