@@ -7,6 +7,7 @@ import postgres from "postgres";
 import fs from "fs/promises";
 import SessionManager from "./auth/SessionManager";
 import Cookie from "./auth/Cookie";
+import SearchController from "./controllers/SearchController";
 
 /**
  * Options for creating a new Server instance.
@@ -31,6 +32,7 @@ export default class Server {
 	private sql: postgres.Sql;
 	private router: Router;
 	private controller: Controller;
+	private searchController: SearchController;
 
 	/**
 	 * Initializes a new Server instance. The server is not started until the `start` method is called.
@@ -44,8 +46,10 @@ export default class Server {
 
 		this.router = new Router();
 		this.controller = new Controller(this.sql);
+		this.searchController = new SearchController(this.sql)
 
 		this.controller.registerRoutes(this.router);
+		this.searchController.registerRoutes(this.router)
 
 		this.router.get("/", (req: Request, res: Response) => {
 			res.send({
