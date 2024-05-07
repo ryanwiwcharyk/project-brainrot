@@ -32,7 +32,17 @@ export default class SearchController {
 	}
 
     getSearchForm = async (req: Request, res: Response) => {
-        
+        let messages = req.getSearchParams().get("error")
+
+        await res.send({
+			statusCode: StatusCode.OK,
+			message: "Search page retrieved",
+			payload: {
+				error: messages,
+			},
+			template: "HomeView"
+		});
+
     }
     findPlayerStatistics = async (req: Request, res: Response) => {
         let playerStats: Stats | null = null;
@@ -64,7 +74,7 @@ export default class SearchController {
         await res.send({
             statusCode: StatusCode.Created,
             message: "Player stats added successfully!",
-            redirect: `/search?Davydav`,
+            redirect: `/search?username=Davydav`,
         });
     }
     getStatisticsPage = async (req: Request, res: Response) => {
