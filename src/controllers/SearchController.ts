@@ -3,6 +3,7 @@ import Request from "../router/Request";
 import Response, { StatusCode } from "../router/Response";
 import Router from "../router/Router";
 import { createUTCDate } from "../utils";
+import Stats, { StatsProps } from "../models/Stats";
 
 /**
  * Controller for handling Todo CRUD operations.
@@ -34,8 +35,37 @@ export default class SearchController {
         
     }
     findPlayerStatistics = async (req: Request, res: Response) => {
-        let 
+        let playerStats: Stats | null = null;
+        const response = await fetch('GET https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + req.body.platform);
+        const stats = await response.json();
 
+        let statsProps: StatsProps = {
+            id: stats.global.uid,
+	        playerLevel: stats.global.level,
+	        playerKills: stats.totals.career_kills.value,
+	        // playerDeaths: stats.totals.deaths,
+            // killDeathRatio: ,
+            playerDamage: stats.totals.damage.value,
+            playerWins: stats.totals.career_wins.value,
+            playerRank: stats.global.rankName,
+        };
+
+        try {
+            playerStats = await Stats.create(this.sql, statsProps)
+        } catch (error) {
+            await res.send({
+                statusCode: StatusCode.BadRequest,
+                message: "Error requesting information. Try again later",
+                redirect: `/search`,
+            });
+            return
+        }
+
+        await res.send({
+            statusCode: StatusCode.Created,
+            message: "Player stats added successfully!",
+            redirect: `/search?Davydav`,
+        });
     }
     getStatisticsPage = async (req: Request, res: Response) => {
         throw new Error("Method not implemented.");

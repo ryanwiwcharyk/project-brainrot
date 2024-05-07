@@ -27,7 +27,7 @@ export default class Stats {
 	static async create(
 		sql: postgres.Sql<any>,
 		props: StatsProps,
-	) {
+	): Promise<Stats> {
 		const connection = await sql.reserve();
 
 
@@ -39,6 +39,7 @@ export default class Stats {
 
 		await connection.release();
 
+		return new Stats(sql, convertToCase(snakeToCamel, row) as StatsProps);
 	}
 
     static async read(
