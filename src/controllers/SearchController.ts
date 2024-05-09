@@ -30,7 +30,7 @@ export default class SearchController {
     registerRoutes(router: Router) {
         router.get("/search", this.getSearchForm);
         router.post("/search", this.findPlayerStatistics);
-        router.get("/stats:username", this.getStatisticsPage)
+        router.get("/stats/:username", this.getStatisticsPage)
     }
 
     getSearchForm = async (req: Request, res: Response) => {
@@ -72,9 +72,9 @@ export default class SearchController {
 
             if (playerStats) {
                 await res.send({
-                    statusCode: StatusCode.BadRequest,
-                    message: "Player stats already exist in the database",
-                    redirect: `/search?username=${req.body.username}`,
+                    statusCode: StatusCode.OK,
+                    message: "Player stats exist in the database",
+                    redirect: `/stats/${req.body.username}`,
                 });
                 return;
             }
@@ -95,7 +95,7 @@ export default class SearchController {
             await res.send({
                 statusCode: StatusCode.Created,
                 message: "Player stats added successfully!",
-                redirect: `/search?username=Davydav`,
+                redirect: `/stats/${req.body.username}`,
             });
 
         } 
@@ -110,7 +110,14 @@ export default class SearchController {
         }
     }
     getStatisticsPage = async (req: Request, res: Response) => {
-        throw new Error("Method not implemented.");
+        await res.send({
+            statusCode: StatusCode.OK,
+            message: "Search page retrieved",
+            payload: {
+                
+            },
+            template: "HomeView"
+        });
     }
 
 
