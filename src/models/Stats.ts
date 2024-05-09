@@ -44,13 +44,13 @@ export default class Stats {
 
     static async read(
         sql: postgres.Sql<any>, 
-        id: number
+        id?: number
         ): Promise<Stats | null> {
 		const connection = await sql.reserve();
 
 		const [row] = await connection<StatsProps[]>`
 			SELECT * FROM
-			stats WHERE id = ${id}
+			stats WHERE profile_id = ${id}
 		`;
 
 		await connection.release();

@@ -8,7 +8,7 @@ import {
 
 export interface PlatformProps {
 	id?: number;
-	platformName?: string;
+	platformName: string;
 }
 
 export class Platform {
@@ -16,7 +16,7 @@ export class Platform {
 		private sql: postgres.Sql<any>,
 		public props: PlatformProps,
 	) { }
-	static async platformRead(sql: postgres.Sql<any>, platformName: string) {
+	static async read(sql: postgres.Sql<any>, platformName: string) {
 		const connection = await sql.reserve();
 
 		const [row] = await connection<PlatformProps[]>`

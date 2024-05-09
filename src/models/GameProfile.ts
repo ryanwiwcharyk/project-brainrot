@@ -9,8 +9,7 @@ import {
 export interface ProfileProps {
 	id?: number;
 	username: string;
-	isOnline: boolean;
-	platformId: number;
+	platformId?: number;
 }
 
 
