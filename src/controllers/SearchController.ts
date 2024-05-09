@@ -4,6 +4,8 @@ import Response, { StatusCode } from "../router/Response";
 import Router from "../router/Router";
 import { createUTCDate } from "../utils";
 import Stats, { StatsProps } from "../models/Stats";
+import Profile from "../models/GameProfile";
+import { Platform } from "../models/Platform";
 
 /**
  * Controller for handling Todo CRUD operations.
@@ -46,6 +48,8 @@ export default class SearchController {
     }
     findPlayerStatistics = async (req: Request, res: Response) => {
         let playerStats: Stats | null = null;
+        let gameProfile: Profile | null = null;
+        let platform: Platform | null = null;
         const response = await fetch('GET https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + req.body.platform);
         const stats = await response.json();
 
