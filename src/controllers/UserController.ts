@@ -1,4 +1,4 @@
-import postgres from "postgres";
+import postgres, { ResultQueryMeta } from "postgres";
 import Router from "../router/Router";
 import Request from "../router/Request";
 import Response, { StatusCode } from "../router/Response";
@@ -20,6 +20,7 @@ export default class UserController {
 
     registerRoutes(router: Router) {
         router.post("/users", this.createUser);
+        router.post("/platform", this.registerPlatformAccount)
     }
 
     createUser = async (req: Request, res: Response) => {
@@ -87,4 +88,8 @@ export default class UserController {
 		}
 		
 	};
+
+    registerPlatformAccount = async (req: Request, res: Response) => {
+        
     }
+}
