@@ -30,6 +30,12 @@ export class InvalidCredentialsError extends Error {
 	}
 }
 
+export class DuplicateUsenameError extends Error {
+	constructor() {
+		super("This username is taken. Please try again.")
+	}
+}
+
 export default class User {
 	constructor(
 		private sql: postgres.Sql<any>,
@@ -68,24 +74,28 @@ export default class User {
 
 		props.createdAt = props.createdAt ?? createUTCDate();
 
-		const [row] = await connection<UserProps[]>`
-			SELECT * FROM users
-			WHERE email = ${props.email}
-		`;
+		const email = await connection<UserProps[]>`
+			SELECT email FROM users WHERE email = ${props.email}`;
+		
 
-		if (!row) {
+		const userName = await connection<UserProps[]>`
+			SELECT user_name FROM users WHERE user_name = ${props.name}`;
+
+		if (email.count !== 0) {
+			throw new DuplicateEmailError();
+		}
+		else if (userName.count !== 0) {
+			throw new DuplicateUsenameError();
+		}
+		else {
 			const [row] = await connection<UserProps[]>`
 			INSERT INTO users
 			${sql(convertToCase(camelToSnake, props))}
-			RETURNING *
-			`;
-
+			RETURNING *`;
+		
 			await connection.release();
 
-			return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
-		}
-		else {
-			throw new DuplicateEmailError();
+			return new User(sql, convertToCase(snakeToCamel, row) as UserProps)
 		}
 
 	}
