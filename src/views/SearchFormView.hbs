@@ -1,0 +1,20 @@
+{{> Header }}
+
+<h1>Register</h1>
+
+{{#if error}}
+<p id="error"> {{error}}</p>
+{{/if}}
+<form method="POST" action="/search" id="search-form">
+	
+
+	<input type="text" name="username" placeholder="Username"><br>
+  	<select name="platform">
+    	<option value="PC">PC</option>
+    	<option value="XBOX">XBOX</option>
+    	<option value="PSN">PSN</option>
+  	</select>
+	
+	<input type="submit" value="Create" id="search-form-submit-button">
+</form>
+{{> Footer}}

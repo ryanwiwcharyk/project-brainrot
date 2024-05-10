@@ -40,7 +40,7 @@ CREATE TABLE stats (
     kill_death_ratio DECIMAL(4,2)
     player_damage INTEGER,
     player_wins SMALLINT,
-    player_rank VARCHAR(100)
+    player_rank VARCHAR(100),
     profile_id INTEGER REFERENCES game_profile(id)
 );
 
@@ -52,7 +52,7 @@ CREATE TABLE session_stats (
     games_played SMALLINT,
     session_kills SMALLINT,
     session_deaths SMALLINT,
-    session_kill_death DECIMAL(4,2)
+    session_kill_death DECIMAL(4,2),
     profile_id INTEGER REFERENCES game_profile(id)
 );
 
