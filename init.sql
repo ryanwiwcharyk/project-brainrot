@@ -10,6 +10,9 @@ CREATE TABLE platform (
     id SERIAL PRIMARY KEY,
     platform_name VARCHAR(50)
 );
+INSERT INTO platform (platform_name) VALUES('PC');
+INSERT INTO platform (platform_name) VALUES('XBOX');
+INSERT INTO platform (platform_name) VALUES('PSN');
 
 DROP TABLE IF EXISTS game_profile;
 CREATE TABLE game_profile (
@@ -37,7 +40,7 @@ CREATE TABLE stats (
     player_level SMALLINT,
     player_kills INTEGER,
     player_deaths INTEGER,
-    kill_death_ratio DECIMAL(4,2)
+    kill_death_ratio DECIMAL(4,2),
     player_damage INTEGER,
     player_wins SMALLINT,
     player_rank VARCHAR(100),

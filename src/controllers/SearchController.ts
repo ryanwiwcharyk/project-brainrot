@@ -42,7 +42,7 @@ export default class SearchController {
             payload: {
                 error: messages,
             },
-            template: "HomeView"
+            template: "SearchFormView"
         });
 
     }
@@ -52,7 +52,7 @@ export default class SearchController {
         let playerStats: Stats | null = null;
 
         try {
-            const response = await fetch('GET https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + req.body.platform);
+            const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + req.body.platform);
             const stats = await response.json();
 
             platform = await Platform.read(this.sql, req.body.platform)
@@ -80,14 +80,13 @@ export default class SearchController {
             }
 
             let statsProps: StatsProps = {
-                id: stats.global.uid,
-                playerLevel: stats.global.level,
-                playerKills: stats.totals.career_kills.value,
-                // playerDeaths: stats.totals.deaths,
+                playerLevel: stats.global.level ?? null,
+                playerKills: stats.total.kills.value ?? null,
+                // playerDeaths: stats?.totals?.deaths?.value ?? null,
                 // killDeathRatio: ,
-                playerDamage: stats.totals.damage.value,
-                playerWins: stats.totals.career_wins.value,
-                playerRank: stats.global.rankName,
+                playerDamage: stats.total.damage.value ?? null,
+                playerWins: stats.total.career_wins?.value ?? null,
+                playerRank: stats.global.rank.rankName ?? null,
                 profileId: gameProfile.props.id
             };
 
@@ -104,7 +103,7 @@ export default class SearchController {
             await res.send({
                 statusCode: StatusCode.BadRequest,
                 message: "Error requesting information. Try again later",
-                redirect: `/search`,
+                redirect: `/search?error=try_again`,
             });
             return
         }
@@ -116,7 +115,7 @@ export default class SearchController {
             payload: {
                 
             },
-            template: "HomeView"
+            template: "StatsView"
         });
     }
 
