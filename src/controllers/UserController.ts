@@ -9,6 +9,7 @@ import User, {DuplicateEmailError, DuplicateUsenameError, UserProps} from "../mo
 import SessionManager from "../auth/SessionManager";
 import Cookie from "../auth/Cookie";
 import { createUTCDate } from "../utils";
+import Profile from "../models/GameProfile";
 
 
 export default class UserController {
@@ -20,7 +21,7 @@ export default class UserController {
 
     registerRoutes(router: Router) {
         router.post("/users", this.createUser);
-        router.post("/platform", this.registerPlatformAccount)
+        router.post("/profile", this.registerPlatformAccount)
     }
 
     createUser = async (req: Request, res: Response) => {
@@ -90,6 +91,35 @@ export default class UserController {
 	};
 
     registerPlatformAccount = async (req: Request, res: Response) => {
-        
+        let userId: number = req.session.get("userId");
+        let gameProfileUsername: string = req.session.get("gameProfileUsername");
+        let gameProfile: Profile | null = await Profile.read(this.sql, gameProfileUsername)
+
+        if (!gameProfile) {
+            await res.send({
+				statusCode: StatusCode.NotFound,
+				message: "Error linking profiles",
+				redirect: `/stats/${gameProfileUsername}?error=profile_not_found`,
+			});
+            return;
+        }
+
+        try {
+            await gameProfile?.linkToSiteProfile(userId)
+        } catch (error) {
+            await res.send({
+				statusCode: StatusCode.NotFound,
+				message: "Error linking profiles",
+				redirect: `/stats/${gameProfileUsername}?error=profile_not_found`,
+			});
+            return;
+        }
+
+        await res.send({
+            statusCode: StatusCode.OK,
+            message: "Profiles linked successfully",
+            redirect: `/stats/${gameProfileUsername}`,
+        });
+
     }
 }

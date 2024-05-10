@@ -198,16 +198,11 @@ export default class AuthController{
 					}
 					res.setCookie(cookie)
 					res.setCookie(req.session.cookie)
-					console.log(req.session.get("userId"))
 					await res.send(
 						{
 							statusCode: StatusCode.OK,
 							message: "Logged in successfully!",
 							redirect: "/search",
-							template: "SearchFormView",
-							payload: {
-								user: loggedInUser.props
-							}
 						}
 					)
 				}

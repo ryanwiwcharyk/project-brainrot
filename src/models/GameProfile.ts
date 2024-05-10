@@ -10,6 +10,7 @@ export interface ProfileProps {
 	id?: number;
 	username: string;
 	platformId?: number;
+	siteUserId?: number;
 }
 
 
@@ -52,6 +53,20 @@ export default class Profile {
 		}
 
 		return new Profile(sql, convertToCase(snakeToCamel, row) as ProfileProps);
+	}
+
+	async linkToSiteProfile(siteProfileId: number) {
+		const connection = await this.sql.reserve();
+
+		const [row] = await connection`
+		UPDATE game_profile 
+		SET site_user_id = ${siteProfileId}
+		WHERE id = ${this.props.id}
+		RETURNING *`;
+
+		await connection.release();
+
+		this.props = {...this.props, ...convertToCase(snakeToCamel, row)};
 	}
 
 }

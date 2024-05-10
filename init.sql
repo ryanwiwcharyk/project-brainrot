@@ -19,6 +19,7 @@ CREATE TABLE game_profile (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100),
     is_online BOOLEAN,
+    site_user_id INTEGER,
     platform_id INTEGER REFERENCES platform(id)
 );
 

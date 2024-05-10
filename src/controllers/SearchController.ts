@@ -75,7 +75,8 @@ export default class SearchController {
 
                 gameProfile = await Profile.create(this.sql, profileStats)
             }
-            
+            req.session.set("gameProfileId", gameProfile.props.id);
+            req.session.set("gameProfileUsername", gameProfile.props.username);
             playerStats = await Stats.read(this.sql, gameProfile.props.id);
 
             if (playerStats) {
