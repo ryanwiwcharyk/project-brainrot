@@ -3,7 +3,7 @@ import Server from "./src/Server";
 import { HttpResponse, makeHttpRequest } from "./tests/client";
 
 const sql = postgres({
-	database: "TodoDB",
+	database: "UserStats",
 });
 
 const server = new Server({
