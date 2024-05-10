@@ -54,7 +54,15 @@ export default class SearchController {
         try {
             const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + req.body.platform);
             const stats = await response.json();
-
+            if(stats.Error)
+            {
+                await res.send({
+                    statusCode: StatusCode.NotFound,
+                    message: "Player not found",
+                    redirect: `/search?error=player_not_found`,
+                });
+                return
+            }
             platform = await Platform.read(this.sql, req.body.platform)
             gameProfile = await Profile.read(this.sql, req.body.username)
 
@@ -81,12 +89,12 @@ export default class SearchController {
 
             let statsProps: StatsProps = {
                 playerLevel: stats.global.level ?? null,
-                playerKills: stats.total.kills.value ?? null,
+                playerKills: stats.total.kills?.value ?? null,
                 // playerDeaths: stats?.totals?.deaths?.value ?? null,
                 // killDeathRatio: ,
-                playerDamage: stats.total.damage.value ?? null,
+                playerDamage: stats.total.damage?.value ?? null,
                 playerWins: stats.total.career_wins?.value ?? null,
-                playerRank: stats.global.rank.rankName ?? null,
+                playerRank: stats.global.rank?.rankName ?? null,
                 profileId: gameProfile.props.id
             };
 
