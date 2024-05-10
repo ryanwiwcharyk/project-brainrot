@@ -27,29 +27,30 @@ export default class Stats {
 	static async create(
 		sql: postgres.Sql<any>,
 		props: StatsProps,
-	) {
+	): Promise<Stats> {
 		const connection = await sql.reserve();
 
 
 		const [row] = await connection<StatsProps[]>`
-			INSERT INTO users
+			INSERT INTO stats
 			${sql(convertToCase(camelToSnake, props))}
 			RETURNING *
 			`;
 
 		await connection.release();
 
+		return new Stats(sql, convertToCase(snakeToCamel, row) as StatsProps);
 	}
 
     static async read(
         sql: postgres.Sql<any>, 
-        id: number
+        id?: number
         ): Promise<Stats | null> {
 		const connection = await sql.reserve();
 
 		const [row] = await connection<StatsProps[]>`
 			SELECT * FROM
-			stats WHERE id = ${id}
+			stats WHERE profile_id = ${id}
 		`;
 
 		await connection.release();
@@ -70,7 +71,7 @@ export default class Stats {
 		const [row] = await connection`
 		UPDATE stats
 		SET
-			${sql(convertToCase(camelToSnake, updateProps))}, edited_at = ${createUTCDate()}
+			${sql(convertToCase(camelToSnake, updateProps))}
 		WHERE
 			id = ${id}
 		RETURNING *

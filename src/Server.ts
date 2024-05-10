@@ -7,6 +7,7 @@ import postgres from "postgres";
 import fs from "fs/promises";
 import SessionManager from "./auth/SessionManager";
 import Cookie from "./auth/Cookie";
+import SearchController from "./controllers/SearchController";
 import AuthController from "./controllers/AuthController";
 import UserController from "./controllers/UserController";
 
@@ -33,6 +34,7 @@ export default class Server {
 	private sql: postgres.Sql;
 	private router: Router;
 	private controller: Controller;
+	private searchController: SearchController;
 	private authController: AuthController;
 	private userController: UserController;
 
@@ -48,11 +50,13 @@ export default class Server {
 
 		this.router = new Router();
 		this.controller = new Controller(this.sql);
+		this.searchController = new SearchController(this.sql)
 		this.authController = new AuthController(this.sql)
 		this.userController = new UserController(this.sql)
 
 
 		this.controller.registerRoutes(this.router);
+		this.searchController.registerRoutes(this.router)
 		this.authController.registerRoutes(this.router);
 		this.userController.registerRoutes(this.router);
 

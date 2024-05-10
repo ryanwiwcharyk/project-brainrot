@@ -9,8 +9,7 @@ import {
 export interface ProfileProps {
 	id?: number;
 	username: string;
-	isOnline: boolean;
-	platformId: number;
+	platformId?: number;
 }
 
 
@@ -18,14 +17,32 @@ export default class Profile {
 	constructor(
 		private sql: postgres.Sql<any>,
 		public props: ProfileProps,
-	) {}
+	) { }
 
-    static async read(sql: postgres.Sql<any>, id: number) {
+	static async create(
+		sql: postgres.Sql<any>,
+		props: ProfileProps,
+	): Promise<Profile> {
+		const connection = await sql.reserve();
+
+
+		const [row] = await connection<ProfileProps[]>`
+			INSERT INTO game_profile
+			${sql(convertToCase(camelToSnake, props))}
+			RETURNING *
+			`;
+
+		await connection.release();
+
+		return new Profile(sql, convertToCase(snakeToCamel, row) as ProfileProps);
+	}
+
+	static async read(sql: postgres.Sql<any>, username: string) {
 		const connection = await sql.reserve();
 
 		const [row] = await connection<ProfileProps[]>`
 			SELECT * FROM
-			game_profile WHERE id = ${id}
+			game_profile WHERE username = ${username}
 		`;
 
 		await connection.release();
@@ -36,4 +53,5 @@ export default class Profile {
 
 		return new Profile(sql, convertToCase(snakeToCamel, row) as ProfileProps);
 	}
+
 }
