@@ -73,6 +73,18 @@ export default class AuthController{
 				}
 			)
 		}
+		else if (urlSearchParams.has("user_error")) {
+			await res.send(
+				{
+					statusCode: StatusCode.BadRequest,
+					message: "loaded registration form with errors",
+					template: "RegistrationFormView",
+					payload: {
+						error: "A user with this username already exists"
+					}
+				}
+			)
+		}
 		else {
 			await res.send(
 				{
@@ -191,11 +203,10 @@ export default class AuthController{
 						{
 							statusCode: StatusCode.OK,
 							message: "Logged in successfully!",
-							redirect: "/todos",
-							template: "ListView",
+							redirect: "/search",
+							template: "SearchFormView",
 							payload: {
-								user: loggedInUser.props,
-								path: "/todos"
+								user: loggedInUser.props
 							}
 						}
 					)

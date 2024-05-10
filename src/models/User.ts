@@ -10,7 +10,7 @@ import GameProfile, { ProfileProps } from "./GameProfile";
 
 export interface UserProps {
 	id?: number;
-	name: string;
+	userName: string;
 	email: string;
 	password: string;
 	createdAt: Date;
@@ -77,9 +77,8 @@ export default class User {
 		const email = await connection<UserProps[]>`
 			SELECT email FROM users WHERE email = ${props.email}`;
 		
-
 		const userName = await connection<UserProps[]>`
-			SELECT user_name FROM users WHERE user_name = ${props.name}`;
+			SELECT user_name FROM users WHERE user_name = ${props.userName}`;
 
 		if (email.count !== 0) {
 			throw new DuplicateEmailError();

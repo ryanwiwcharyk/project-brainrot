@@ -5,7 +5,7 @@ import Response, { StatusCode } from "../router/Response";
 import View from "../views/View";
 import { URLSearchParams } from "url";
 import Session from "../auth/Session";
-import User, {UserProps} from "../models/User";
+import User, {DuplicateEmailError, DuplicateUsenameError, UserProps} from "../models/User";
 import SessionManager from "../auth/SessionManager";
 import Cookie from "../auth/Cookie";
 import { createUTCDate } from "../utils";
@@ -26,7 +26,7 @@ export default class UserController {
         let user: User | null = null;
 
 		let userProps: UserProps = {
-            name: req.body["username"],
+            userName: req.body["userName"],
 			email: req.body["email"],
 			password: req.body["password"],
 			createdAt: createUTCDate(),
@@ -59,13 +59,24 @@ export default class UserController {
 					}
 				});
 			} catch (error) {
-				await res.send({
-					statusCode: StatusCode.BadRequest,
-					message: "User with this email already exists.",
-					redirect: "/register?email_error=email_duplicate"
-
-				}); 
-			}
+                if (error instanceof DuplicateEmailError) {
+                    await res.send({
+                        statusCode: StatusCode.BadRequest,
+                        message: "User with this email already exists.",
+                        redirect: "/register?email_error=email_duplicate"
+    
+                    });
+                }
+                else if (error instanceof DuplicateUsenameError) {
+                    await res.send({
+                        statusCode: StatusCode.BadRequest,
+                        message: "User with this username already exists.",
+                        redirect: "/register?user_error=username_duplicate"
+    
+                    });
+                }
+				 
+			} 
 		}
 		else {
 			await res.send({
