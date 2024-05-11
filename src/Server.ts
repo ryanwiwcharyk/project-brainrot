@@ -66,7 +66,7 @@ export default class Server {
 				message: "Homepage!",
 				template: "HomeView",
 				payload: {
-					title: "My App",
+					title: "Project Brainrot",
 				},
 			});
 		});

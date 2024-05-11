@@ -54,6 +54,7 @@ export default class SearchController {
         try {
             const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + req.body.platform);
             const stats = await response.json();
+            console.log(stats.Error)
             if(stats.Error)
             {
                 await res.send({
@@ -118,14 +119,42 @@ export default class SearchController {
         }
     }
     getStatisticsPage = async (req: Request, res: Response) => {
-        await res.send({
-            statusCode: StatusCode.OK,
-            message: "Search page retrieved",
-            payload: {
-                
-            },
-            template: "StatsView"
-        });
+        let gameProfileId: number = req.session.get("gameProfileId")
+
+        try {
+            let userStats: Stats | null = await Stats.read(this.sql, gameProfileId);
+
+            if(!userStats) {
+                await res.send({
+                    statusCode: StatusCode.NotFound,
+                    message: "Could not retrieve user stats.",
+                    redirect: "/search?error=try_again"
+                });
+            }
+            else {
+                await res.send({
+                    statusCode: StatusCode.OK,
+                    message: "Search page retrieved",
+                    payload: {
+                        level: userStats.props.playerLevel,
+                        kills: userStats.props.playerKills,
+                        damage: userStats.props.playerDamage,
+                        wins: userStats.props.playerWins,
+                        rank: userStats.props.playerRank
+                    },
+                    template: "StatsView"
+                });
+            }
+            
+
+        } catch (error) {
+            await res.send({
+                statusCode: StatusCode.BadRequest,
+                message: "Error getting user stats.",
+                redirect: "/search?error=try_again"
+            });
+        }
+        
     }
 
 
