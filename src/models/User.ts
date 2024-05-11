@@ -204,4 +204,13 @@ export default class User {
 		await connection.release();
 
 	}
+
+	/*
+	static async GetSiteProfileFromGameProfile (
+		sql: postgres.Sql<any>,
+		gameProfileId: number
+	): Promise<User> {
+
+	}
+	*/
 }

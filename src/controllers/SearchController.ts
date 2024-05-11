@@ -50,9 +50,20 @@ export default class SearchController {
         let platform: Platform | null = null;
         let gameProfile: Profile | null = null;
         let playerStats: Stats | null = null;
+        let platformAPIName: string = "";
+
+        if (req.body["platform"] === "PSN") {
+            platformAPIName = "PS4"
+        }
+        else if (req.body["platform"] === "XBOX") {
+            platformAPIName = "X1"
+        }
+        else {
+            platformAPIName = "PC"
+        }
 
         try {
-            const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + req.body.platform);
+            const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + platformAPIName);
             const stats = await response.json();
             console.log(stats.Error)
             if(stats.Error)
@@ -132,18 +143,47 @@ export default class SearchController {
                 });
             }
             else {
-                await res.send({
-                    statusCode: StatusCode.OK,
-                    message: "Search page retrieved",
-                    payload: {
-                        level: userStats.props.playerLevel,
-                        kills: userStats.props.playerKills,
-                        damage: userStats.props.playerDamage,
-                        wins: userStats.props.playerWins,
-                        rank: userStats.props.playerRank
-                    },
-                    template: "StatsView"
-                });
+                let userGameProfile: Profile | null = await Profile.read(this.sql, req.session.get("gameProfileUsername"))
+                if (userGameProfile) {
+                    if (userGameProfile.props.siteUserId) {
+                        await res.send({
+                            statusCode: StatusCode.OK,
+                            message: "Stats page retrieved",
+                            payload: {
+                                level: userStats.props.playerLevel,
+                                kills: userStats.props.playerKills,
+                                damage: userStats.props.playerDamage,
+                                wins: userStats.props.playerWins,
+                                rank: userStats.props.playerRank,
+                                isLinked: true
+                            },
+                            template: "StatsView"
+                        });
+                    }
+                    else {
+                        await res.send({
+                            statusCode: StatusCode.OK,
+                            message: "Stats page retrieved",
+                            payload: {
+                                level: userStats.props.playerLevel,
+                                kills: userStats.props.playerKills,
+                                damage: userStats.props.playerDamage,
+                                wins: userStats.props.playerWins,
+                                rank: userStats.props.playerRank,
+                                isLinked: false
+                            },
+                            template: "StatsView"
+                        });
+                    }
+                }
+                else {
+                    await res.send({
+                        statusCode: StatusCode.InternalServerError,
+                        message: "Search page retrieved with errors",
+                        redirect: "/search?error=try_again"
+                    });
+                }
+                
             }
             
 

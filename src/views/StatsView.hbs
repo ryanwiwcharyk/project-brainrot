@@ -3,19 +3,20 @@
 
 <h1>Stats</h1>
 
-<p>{{level}}</p>
-<p>{{kills}}</p>
-<p>{{damage}}</p>
-<p>{{wins}}</p>
-<p>{{rank}}</p>
+<p> level: {{level}}</p>
+<p> kills: {{kills}}</p>
+<p> damage: {{damage}}</p>
+<p> wins: {{wins}}</p>
+<p> rank: {{rank}}</p>
 
 
-
+{{#unless isLinked}}
 <form method="POST" action="/profile"> 
     <label>
         Is this your profile?
     </label>
     <input type="submit" value="Claim" id="search-form-submit-button">
 </form>
+{{/unless}}
 
 {{> Footer }}
