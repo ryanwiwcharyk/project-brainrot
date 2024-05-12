@@ -150,6 +150,7 @@ export default class SearchController {
                             statusCode: StatusCode.OK,
                             message: "Stats page retrieved",
                             payload: {
+                                name: userGameProfile.props.username,
                                 level: userStats.props.playerLevel,
                                 kills: userStats.props.playerKills,
                                 damage: userStats.props.playerDamage,
@@ -165,6 +166,7 @@ export default class SearchController {
                             statusCode: StatusCode.OK,
                             message: "Stats page retrieved",
                             payload: {
+                                name: userGameProfile.props.username,
                                 level: userStats.props.playerLevel,
                                 kills: userStats.props.playerKills,
                                 damage: userStats.props.playerDamage,

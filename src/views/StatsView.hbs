@@ -1,13 +1,34 @@
 {{> Header }}
 
 
-<h1>Stats</h1>
+<h1> {{name}}'s stats</h1>
 
-<p> level: {{level}}</p>
-<p> kills: {{kills}}</p>
-<p> damage: {{damage}}</p>
-<p> wins: {{wins}}</p>
-<p> rank: {{rank}}</p>
+
+<div class="container">
+    <div class="grid-container">
+        <div class="grid-item">
+            <span>Level:</span>
+            <span>{{level}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Kills:</span>
+            <span>{{kills}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Damage:</span>
+            <span>{{damage}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Wins:</span>
+            <span>{{wins}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Rank:</span>
+            <span>{{rank}}</span>
+        </div>
+    </div>
+</div>
+
 
 
 {{#unless isLinked}}

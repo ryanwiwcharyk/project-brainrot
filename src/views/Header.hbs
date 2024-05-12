@@ -13,10 +13,15 @@
 	<header>
 		<nav id="nav-header" name="nav-header">
 			<img src="../../images/logo.png" id="logo">
-			<ul>
-				<li><a href="{{ path 'login' }}">Login</a></li>
-				<li><a href="{{ path 'register' }}">Register</a></li>
-			</ul>
+			<div id="nav-form-holder">
+				<form method="GET" action="/login" class="nav-form">
+				<input type="submit" value="Login" class="nav-button">
+				</form>
+				<form method="GET" action="/register" class="nav-form">
+				<input type="submit" value="Register" class="nav-button">
+				</form>
+			</div>
+			
 		</nav>
 	</header>
 	<main>
