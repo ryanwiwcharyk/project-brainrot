@@ -50,31 +50,10 @@ export default class SearchController {
         let platform: Platform | null = null;
         let gameProfile: Profile | null = null;
         let playerStats: Stats | null = null;
-        let platformAPIName: string = "";
-
-        if (req.body["platform"] === "PSN") {
-            platformAPIName = "PS4"
-        }
-        else if (req.body["platform"] === "XBOX") {
-            platformAPIName = "X1"
-        }
-        else {
-            platformAPIName = "PC"
-        }
-
+    
         try {
-            const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + platformAPIName);
-            const stats = await response.json();
-            console.log(stats.Error)
-            if(stats.Error)
-            {
-                await res.send({
-                    statusCode: StatusCode.NotFound,
-                    message: "Player not found",
-                    redirect: `/search?error=player_not_found`,
-                });
-                return
-            }
+            
+            //check db for stats
             platform = await Platform.read(this.sql, req.body.platform)
             gameProfile = await Profile.read(this.sql, req.body.username)
 
@@ -97,36 +76,47 @@ export default class SearchController {
                     message: "Player stats exist in the database",
                     redirect: `/stats/${req.body.username}`,
                 });
-                return;
             }
-
-            let statsProps: StatsProps = {
-                playerLevel: stats.global.level ?? null,
-                playerKills: stats.total.kills?.value ?? null,
-                // playerDeaths: stats?.totals?.deaths?.value ?? null,
-                // killDeathRatio: ,
-                playerDamage: stats.total.damage?.value ?? null,
-                playerWins: stats.total.career_wins?.value ?? null,
-                playerRank: stats.global.rank?.rankName ?? null,
-                profileId: gameProfile.props.id
-            };
-
-            playerStats = await Stats.create(this.sql, statsProps)
-            await res.send({
-                statusCode: StatusCode.Created,
-                message: "Player stats added successfully!",
-                redirect: `/stats/${req.body.username}`,
-            });
-
+            else {
+                let platformAPIName: string = this.GetPlatformAPIName(req, res);
+                const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + platformAPIName);
+                const stats = await response.json();
+                if(stats.Error)
+                {
+                    await res.send({
+                        statusCode: StatusCode.NotFound,
+                        message: "Player not found in API",
+                        redirect: `/search?error=player_not_found`,
+                    });
+                    
+                } else {
+                    let statsProps: StatsProps = {
+                        playerLevel: stats.global.level ?? null,
+                        playerKills: stats.total.kills?.value ?? null,
+                        // playerDeaths: stats?.totals?.deaths?.value ?? null,
+                        // killDeathRatio: ,
+                        playerDamage: stats.total.damage?.value ?? null,
+                        playerWins: stats.total.career_wins?.value ?? null,
+                        playerRank: stats.global.rank?.rankName ?? null,
+                        profileId: gameProfile.props.id
+                    };
+        
+                    playerStats = await Stats.create(this.sql, statsProps)
+                    await res.send({
+                        statusCode: StatusCode.Created,
+                        message: "Player stats added successfully!",
+                        redirect: `/stats/${req.body.username}`,
+                    });
+                }
+            }
         } 
         catch (error) 
         {
             await res.send({
                 statusCode: StatusCode.BadRequest,
-                message: "Error requesting information. Try again later",
+                message: "Error requesting information. The API might be down",
                 redirect: `/search?error=try_again`,
             });
-            return
         }
     }
     getStatisticsPage = async (req: Request, res: Response) => {
@@ -197,6 +187,19 @@ export default class SearchController {
             });
         }
         
+    }
+
+
+    private GetPlatformAPIName(req: Request, res: Response): string {
+        if (req.body["platform"] === "PSN") {
+            return "PS4"
+        }
+        else if (req.body["platform"] === "XBOX") {
+            return "X1"
+        }
+        else {
+            return "PC"
+        }
     }
 
 
