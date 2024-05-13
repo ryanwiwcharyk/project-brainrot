@@ -124,7 +124,7 @@ export default class AuthController{
 				}
 			)
         }
-		else if (urlSearchParams.has("emtpy_email")) {
+		else if (urlSearchParams.has("empty_email")) {
 			await res.send(
 				{
 					statusCode: StatusCode.BadRequest,

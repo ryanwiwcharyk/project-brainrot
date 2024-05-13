@@ -73,4 +73,92 @@ body {
 .grid-item span {
     font-weight: bold;
 }
+
+#login-form-container {
+  display:  flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#login-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center; /* Center align form contents */
+}
+
+/* Styling the form headings */
+h2 {
+  margin-bottom: 20px;
+}
+
+/* Styling the form labels and inputs */
+#error {
+  padding: 5px;
+  margin: 5px;
+  color: red;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  text-align: left; /* Left align form labels */
+}
+
+.login-form-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Styling the submit button */
+#login-form-submit-button {
+  background-color: navy;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Hover effect for the submit button */
+#login-form-submit-button:hover {
+  background-color: #001f3f;
+}
+
+p {
+  margin-top: 20px;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+
+#remember-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+#remember {
+  margin-right: 10px;
+}
+
+#remember-label {
+  margin-top: 10px;
+}
+
+/* Login form */
+
   

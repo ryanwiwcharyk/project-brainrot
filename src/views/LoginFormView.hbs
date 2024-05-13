@@ -1,33 +1,42 @@
 {{> Header}}
 
-<h1>Login</h1>
 
-{{#if error}}
-<p id="error"> {{error}}</p>
-{{/if}}
-
-<form method="POST" action="/login" id="login-form">
-		
+<div id="login-form-container">
+	<form method="POST" action="/login" id="login-form">
+		<h2>Login</h2>
+		{{#if error}}
+		<p id="error"> {{error}}</p>
+		{{/if}}
 		{{#if emailCookie}}
 		<label>
-			Email
-			<input type="text" name="email" value="{{emailCookie}}">
-		</label> <br>
+			
+			<input type="text" name="email" value="{{emailCookie}}" class="login-form-input" placeholder="Email">
+		</label> 
 		{{else}}
 		<label>
-			Email
-			<input type="text" name="email">
-		</label> <br>
+			
+			<input type="text" name="email" class="login-form-input" placeholder="Email">
+		</label> 
 		{{/if}}
         <label>
-            Password
-            <input type="text" name="password">
-        </label> <br>
+            
+            <input type="password" name="password" class="login-form-input" placeholder="Password">
+        </label> 
 
-		<input id="remember" type="checkbox" name="remember">
-  		<label for="remember"> Remember me</label><br>
+		<div id="remember-container">
+			<input id="remember" type="checkbox" name="remember">
+  			<label id="remember-label" for="remember"> Remember me</label>
+		</div>
+		
 	
 	<input type="submit" value="Login" id="login-form-submit-button">
+	<p>Don't have an account?<a href="/register"> Sign Up</a></p>
 </form>
+</div>
+
+
+ 
+
+
 
 {{> Footer}}
