@@ -31,6 +31,7 @@ export default class SearchController {
         router.get("/search", this.getSearchForm);
         router.post("/search", this.findPlayerStatistics);
         router.get("/stats/:username", this.getStatisticsPage)
+        router.post("/search/linked", this.getLinkedProfileStats)
     }
 
     getSearchForm = async (req: Request, res: Response) => {
@@ -191,7 +192,48 @@ export default class SearchController {
         
     }
 
-    
+    getLinkedProfileStats = async (req: Request, res: Response) => {
+        let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"));
+
+        if (!gameProfile) {
+            await res.send({
+                statusCode: StatusCode.NotFound,
+                message: "Could not find game profile.",
+                redirect: "/search?error=try_again"
+            });
+            return
+        }
+
+        let profileStats: Stats | null = await Stats.read(this.sql, gameProfile?.props.id);
+
+        if (!profileStats) {
+            await res.send({
+                statusCode: StatusCode.NotFound,
+                message: "Error getting user stats from database.",
+                redirect: "/search?error=try_again"
+            });
+            return
+        }
+        else {
+            await res.send({
+                statusCode: StatusCode.OK,
+                message: "Stats page retrieved",
+                payload: {
+                    name: gameProfile.props.username,
+                    level: profileStats.props.playerLevel,
+                    kills: profileStats.props.playerKills,
+                    damage: profileStats.props.playerDamage,
+                    wins: profileStats.props.playerWins,
+                    rank: profileStats.props.playerRank,
+                    isLinked: true,
+                    isLoggedIn: req.session.get("isLoggedIn")
+                },
+                template: "StatsView"
+            });
+        }
+    }
+
+
 
     private GetPlatformAPIName(req: Request, res: Response): string {
         if (req.body["platform"] === "PSN") {

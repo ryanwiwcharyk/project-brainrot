@@ -69,4 +69,21 @@ export default class Profile {
 		this.props = {...this.props, ...convertToCase(snakeToCamel, row)};
 	}
 
+	static async getGameProfileFromUserId(sql: postgres.Sql<any>, siteUserId: number): Promise<Profile | null>{
+		const connection = await sql.reserve();
+
+		const [row] = await connection<ProfileProps[]>`
+			SELECT * FROM
+			game_profile WHERE site_user_id = ${siteUserId}
+		`;
+
+		await connection.release();
+
+		if (!row) {
+			return null;
+		}
+
+		return new Profile(sql, convertToCase(snakeToCamel, row) as ProfileProps);
+	}
+
 }

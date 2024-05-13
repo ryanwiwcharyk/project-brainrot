@@ -154,7 +154,7 @@ export default class UserController {
 				error: messages,
 				//darkmode: dark,
 				pic: pic,
-				loggedIn: session.get("isLoggedIn"),
+				isLoggedIn: session.get("isLoggedIn"),
 			},
 			template: "EditProfileView"
 		});
