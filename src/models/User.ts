@@ -98,7 +98,7 @@ export default class User {
 		}
 
 	}
-	async update(
+	static async update(
 		sql: postgres.Sql<any>,
 		updateProps: Partial<UserProps>,
 		id: number

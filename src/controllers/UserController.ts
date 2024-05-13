@@ -22,6 +22,9 @@ export default class UserController {
     registerRoutes(router: Router) {
         router.post("/users", this.createUser);
         router.post("/profile", this.registerPlatformAccount)
+
+		router.get("/users/edit", this.getUserPage);
+		router.put("/users/edit", this.updateUser);
     }
 
     createUser = async (req: Request, res: Response) => {
@@ -122,4 +125,108 @@ export default class UserController {
         });
 
     }
+	getUserPage = async (req: Request, res: Response) => {
+		let messages = req.getSearchParams().get("error")
+
+
+		let darkmode = req.findCookie("darkmode")?.value
+		let dark = false
+		if(darkmode == "dark"){
+			dark = true
+		}
+		let pic = req.findCookie("pic")?.value
+
+		let session = req.getSession();
+		if(!session.get("userId"))
+		{
+			await res.send({
+				statusCode: StatusCode.Unauthorized,
+				message: "Unauthorized",
+				redirect: `/login`,
+			});			
+			return
+		}
+
+		await res.send({
+			statusCode: StatusCode.OK,
+			message: "Login retrieved",
+			payload: {
+				error: messages,
+				darkmode: dark,
+				pic: pic,
+				loggedIn: session.get("loggedIn"),
+			},
+			template: "EditProfileView"
+		});
+	}
+	updateUser = async (req: Request, res: Response) => {
+		let session = req.getSession();
+		let userProps: Partial<UserProps> = {}
+		if(!session.get("userId"))
+		{
+			await res.send({
+					statusCode: StatusCode.Unauthorized,
+					message: "Unauthorized",
+					redirect: `/login`,
+			});			
+			return
+		}
+		
+		let id = session.get("userId")
+		
+		if(req.body.email){
+			userProps.email = req.body.email
+		}
+		if(req.body.pic){
+			userProps.profile = req.body.pic
+		}
+		if(req.body.password){
+			userProps.password = req.body.password
+		}
+		if(!req.body.password && !req.body.pic && !req.body.email && req.body.darkmode){
+			res.setCookie(new Cookie("darkmode", "dark"))
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "User updated successfully!",
+				redirect: "/users/edit?error=lacking_info"
+			});	
+		}
+		if(!req.body.password && !req.body.pic && !req.body.email && !req.body.darkmode){
+			res.setCookie(new Cookie("darkmode", "light"))
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "User updated successfully!",
+				redirect: "/users/edit?error=lacking_info"
+			});	
+		}
+
+		try{
+			let user: User = await User.update(this.sql, userProps, id)
+
+			if(req.body.darkmode){
+				res.setCookie(new Cookie("darkmode", "dark"))
+			}
+			else{
+				res.setCookie(new Cookie("darkmode", "light"))
+			}
+
+			if(req.body.pic){
+				res.setCookie(new Cookie("pic", req.body.pic))
+			}
+
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "User updated successfully!",
+				redirect: "/users/edit?error=lacking_info"
+			});	
+		}
+		catch{
+			await res.send({
+				statusCode: StatusCode.BadRequest,
+				message: "User with this email already exists.",
+				redirect: "/users/edit?error=lacking_info"
+			});
+		}
+
+	};
 }
