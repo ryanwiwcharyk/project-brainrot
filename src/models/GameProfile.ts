@@ -69,6 +69,20 @@ export default class Profile {
 		this.props = {...this.props, ...convertToCase(snakeToCamel, row)};
 	}
 
+	async unlinkPlatformAccount(siteProfileId: number) {
+		const connection = await this.sql.reserve();
+
+		const [row] = await connection`
+		UPDATE game_profile 
+		SET site_user_id = NULL
+		WHERE id = ${this.props.id}
+		RETURNING *`;
+
+		await connection.release();
+
+		this.props = {...this.props, ...convertToCase(snakeToCamel, row)};
+	}
+
 	static async getGameProfileFromUserId(sql: postgres.Sql<any>, siteUserId: number): Promise<Profile | null>{
 		const connection = await sql.reserve();
 

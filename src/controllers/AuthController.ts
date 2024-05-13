@@ -188,6 +188,7 @@ export default class AuthController{
 				if (loggedInUser) {
 					req.session.set("isLoggedIn", true);
 					req.session.set("userId", loggedInUser.props.id)
+					req.session.set("email", loggedInUser.props.email)
 					if (req.body.remember === "on") {
 						cookie = new Cookie("email", email)
 					}

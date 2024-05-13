@@ -5,7 +5,7 @@ import Response, { StatusCode } from "../router/Response";
 import View from "../views/View";
 import { URLSearchParams } from "url";
 import Session from "../auth/Session";
-import User, {DuplicateEmailError, DuplicateUsenameError, UserProps} from "../models/User";
+import User, { DuplicateEmailError, DuplicateUsenameError, UserProps } from "../models/User";
 import SessionManager from "../auth/SessionManager";
 import Cookie from "../auth/Cookie";
 import { createUTCDate } from "../utils";
@@ -13,47 +13,48 @@ import Profile from "../models/GameProfile";
 
 
 export default class UserController {
-    private sql: postgres.Sql<any>;
+	private sql: postgres.Sql<any>;
 
-    constructor (sql: postgres.Sql<any>) {
-        this.sql = sql
-    }
+	constructor(sql: postgres.Sql<any>) {
+		this.sql = sql
+	}
 
-    registerRoutes(router: Router) {
-        router.post("/users", this.createUser);
-        router.post("/profile", this.registerPlatformAccount)
+	registerRoutes(router: Router) {
+		router.post("/users", this.createUser);
+		router.post("/profile", this.registerPlatformAccount)
+		router.get("/unlink", this.unlinkPlatformProfile)
 
 		router.get("/users/edit", this.getUserPage);
 		router.put("/users/edit", this.updateUser);
-    }
+	}
 
-    createUser = async (req: Request, res: Response) => {
-        let user: User | null = null;
+	createUser = async (req: Request, res: Response) => {
+		let user: User | null = null;
 
 		let userProps: UserProps = {
-            userName: req.body["userName"],
+			userName: req.body["userName"],
 			email: req.body["email"],
 			password: req.body["password"],
 			createdAt: createUTCDate(),
 		};
-		if (!userProps.email){
+		if (!userProps.email) {
 			await res.send({
 				statusCode: StatusCode.BadRequest,
 				message: "Missing email.",
 				redirect: "/register?empty_email=email_empty"
-		})}
+			})
+		}
 		else if (!userProps.password) {
 			await res.send({
 				statusCode: StatusCode.BadRequest,
 				message: "Missing password.",
 				redirect: "/register?empty_password=password_empty"
-		})
+			})
 		}
-		else if (req.body["password"] === req.body["confirmPassword"])
-		{
+		else if (req.body["password"] === req.body["confirmPassword"]) {
 			try {
 				user = await User.create(this.sql, userProps);
-	
+
 				await res.send({
 					statusCode: StatusCode.Created,
 					message: "User created",
@@ -64,86 +65,116 @@ export default class UserController {
 					}
 				});
 			} catch (error) {
-                if (error instanceof DuplicateEmailError) {
-                    await res.send({
-                        statusCode: StatusCode.BadRequest,
-                        message: "User with this email already exists.",
-                        redirect: "/register?email_error=email_duplicate"
-    
-                    });
-                }
-                else if (error instanceof DuplicateUsenameError) {
-                    await res.send({
-                        statusCode: StatusCode.BadRequest,
-                        message: "User with this username already exists.",
-                        redirect: "/register?user_error=username_duplicate"
-    
-                    });
-                }
-				 
-			} 
+				if (error instanceof DuplicateEmailError) {
+					await res.send({
+						statusCode: StatusCode.BadRequest,
+						message: "User with this email already exists.",
+						redirect: "/register?email_error=email_duplicate"
+
+					});
+				}
+				else if (error instanceof DuplicateUsenameError) {
+					await res.send({
+						statusCode: StatusCode.BadRequest,
+						message: "User with this username already exists.",
+						redirect: "/register?user_error=username_duplicate"
+
+					});
+				}
+
+			}
 		}
 		else {
 			await res.send({
 				statusCode: StatusCode.BadRequest,
 				message: "Passwords do not match",
 				redirect: `/register?password_error=password_mismatch`,
-			}); 
+			});
 		}
-		
+
 	};
 
-    registerPlatformAccount = async (req: Request, res: Response) => {
-        let userId: number = req.session.get("userId");
-        let gameProfileUsername: string = req.session.get("gameProfileUsername");
-        let gameProfile: Profile | null = await Profile.read(this.sql, gameProfileUsername)
+	registerPlatformAccount = async (req: Request, res: Response) => {
+		let userId: number = req.session.get("userId");
+		let gameProfileUsername: string = req.session.get("gameProfileUsername");
+		let gameProfile: Profile | null = await Profile.read(this.sql, gameProfileUsername)
 
-        if (!gameProfile) {
-            await res.send({
+		if (!gameProfile) {
+			await res.send({
 				statusCode: StatusCode.NotFound,
 				message: "Error linking profiles",
 				redirect: `/stats/${gameProfileUsername}?error=profile_not_found`,
 			});
-            return;
-        }
+			return;
+		}
 
-        try {
-            await gameProfile?.linkToSiteProfile(userId)
-        } catch (error) {
-            await res.send({
+		try {
+			await gameProfile?.linkToSiteProfile(userId)
+		} catch (error) {
+			await res.send({
 				statusCode: StatusCode.NotFound,
 				message: "Error linking profiles",
 				redirect: `/stats/${gameProfileUsername}?error=profile_not_found`,
 			});
-            return;
-        }
+			return;
+		}
 
-        await res.send({
-            statusCode: StatusCode.OK,
-            message: "Profiles linked successfully",
-            redirect: `/stats/${gameProfileUsername}`,
-        });
+		await res.send({
+			statusCode: StatusCode.OK,
+			message: "Profiles linked successfully",
+			redirect: `/stats/${gameProfileUsername}`,
+		});
 
-    }
+	}
+
+	unlinkPlatformProfile = async (req: Request, res: Response) => {
+		let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
+
+		if (!gameProfile) {
+			await res.send({
+				statusCode: StatusCode.NotFound,
+				message: "Error finding profile in database",
+				redirect: `/stats/${req.session.get("gameProfileUsername")}?error=profile_not_found`,
+			});
+			return;
+		}
+		try {
+			await gameProfile?.unlinkPlatformAccount(req.session.get("userId"))
+		} catch (error) {
+			await res.send({
+				statusCode: StatusCode.NotFound,
+				message: "Error unlinking accounts",
+				redirect: `/stats/${req.session.get("gameProfileUsername")}?error=profile_not_found`,
+			});
+			return;
+		}
+
+		await res.send({
+			statusCode: StatusCode.OK,
+			message: "Profiles linked successfully",
+			redirect: `/users/edit`,
+		});
+	}
+
 	getUserPage = async (req: Request, res: Response) => {
 		let messages = req.getSearchParams().get("error")
-
+		let loggedInUser: User | null = await User.read(this.sql, req.session.get("userId"))
+		let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
 
 		let darkmode = req.findCookie("darkmode")?.value
 		let dark = false
-		if(darkmode == "dark"){
+		if (darkmode == "dark") {
 			dark = true
 		}
 		let pic = req.findCookie("pic")?.value
 
 		let session = req.getSession();
-		if(!session.get("userId"))
-		{
+		if (!session.get("userId")) {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
 				message: "Unauthorized",
 				redirect: `/login`,
-			});			
+			});
 			return
 		}
 
@@ -155,6 +186,9 @@ export default class UserController {
 				//darkmode: dark,
 				pic: pic,
 				isLoggedIn: session.get("isLoggedIn"),
+				email: loggedInUser?.props.email,
+				username: loggedInUser?.props.userName,
+				gameProfile: gameProfile
 			},
 			template: "EditProfileView"
 		});
@@ -162,55 +196,54 @@ export default class UserController {
 	updateUser = async (req: Request, res: Response) => {
 		let session = req.getSession();
 		let userProps: Partial<UserProps> = {}
-		if(!session.get("userId"))
-		{
+		if (!session.get("userId")) {
 			await res.send({
-					statusCode: StatusCode.Unauthorized,
-					message: "Unauthorized",
-					redirect: `/login`,
-			});			
+				statusCode: StatusCode.Unauthorized,
+				message: "Unauthorized",
+				redirect: `/login`,
+			});
 			return
 		}
-		
+
 		let id = session.get("userId")
-		
-		if(req.body.email){
+
+		if (req.body.email) {
 			userProps.email = req.body.email
 		}
-		if(req.body.pic){
+		if (req.body.pic) {
 			userProps.profilePicture = req.body.pic
 		}
-		if(req.body.password){
+		if (req.body.password) {
 			userProps.password = req.body.password
 		}
-		if(!req.body.password && !req.body.pic && !req.body.email && req.body.darkmode){
+		if (!req.body.password && !req.body.pic && !req.body.email && req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "dark"))
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
 				redirect: "/users/edit?error=lacking_info"
-			});	
+			});
 		}
-		if(!req.body.password && !req.body.pic && !req.body.email && !req.body.darkmode){
+		if (!req.body.password && !req.body.pic && !req.body.email && !req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "light"))
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
 				redirect: "/users/edit?error=lacking_info"
-			});	
+			});
 		}
 
-		try{
+		try {
 			let user: User = await User.update(this.sql, userProps, id)
 
-			if(req.body.darkmode){
+			if (req.body.darkmode) {
 				res.setCookie(new Cookie("darkmode", "dark"))
 			}
-			else{
+			else {
 				res.setCookie(new Cookie("darkmode", "light"))
 			}
 
-			if(req.body.pic){
+			if (req.body.pic) {
 				res.setCookie(new Cookie("pic", req.body.pic))
 			}
 
@@ -218,9 +251,9 @@ export default class UserController {
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
 				redirect: "/users/edit?error=lacking_info"
-			});	
+			});
 		}
-		catch{
+		catch {
 			await res.send({
 				statusCode: StatusCode.BadRequest,
 				message: "User with this email already exists.",

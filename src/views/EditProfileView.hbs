@@ -7,6 +7,9 @@
 <form id="edit-profile-form" action="/users/edit" method="POST">
     <input type="hidden" name="method" value="PUT">
 
+    <label for="username">Username:</label>
+	<input type="text" id="username" name="username" value="{{ username }}"/><br>
+
 	<label for="email">Email:</label>
 	<input type="text" id="email" name="email" value="{{ email }}"/><br>
 
@@ -26,6 +29,17 @@
 	{{/if}}
 
     <button id="edit-todo-form-submit-button">Edit</button>
+
+    
 </form>
+
+{{#if gameProfile}}
+    <form action="/unlink" method="GET">
+        <label for="platformUsername">Platform Username:</label>
+        <input type="text" id="platformUsername" name="platformUsername" value="{{gameProfile.props.username}}"/><br>
+        <input type="submit" value="Unlink platform account">
+    </form>
+    
+    {{/if}}
 
 {{> Footer }}
