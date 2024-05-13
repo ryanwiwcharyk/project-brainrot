@@ -191,6 +191,7 @@ export default class SearchController {
         
     }
 
+    
 
     private GetPlatformAPIName(req: Request, res: Response): string {
         if (req.body["platform"] === "PSN") {

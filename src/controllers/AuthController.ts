@@ -98,8 +98,7 @@ export default class AuthController{
 
     getLoginForm = async (req: Request, res: Response) => {
         let urlSearchParams: URLSearchParams = req.getSearchParams();
-		let session: Session = req.getSession();
-        res.setCookie(new Cookie("session_id", session.id))
+        res.setCookie(req.session.cookie)
 		if (urlSearchParams.has("login_error")) {
 			await res.send(
 				{
@@ -156,7 +155,7 @@ export default class AuthController{
 		await res.send({
 			statusCode: StatusCode.OK,
 			message: "User successfully logged out",
-			redirect: "/"
+			redirect: "/login"
 		})
     }
 
