@@ -69,6 +69,7 @@ export default class SearchController {
             }
             req.session.set("gameProfileId", gameProfile.props.id);
             req.session.set("gameProfileUsername", gameProfile.props.username);
+            res.setCookie(req.session.cookie)
             playerStats = await Stats.read(this.sql, gameProfile.props.id);
 
             if (playerStats) {
