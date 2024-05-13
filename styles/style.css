@@ -159,6 +159,27 @@ p {
   margin-top: 10px;
 }
 
-/* Login form */
+.nav-search-form {
+  margin-right: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.nav-search-input {
+  padding: 8px;
+  border-radius: 5px;
+  border: 2px solid #fff;
+  color: navy;
+  background-color: #fff;
+  font-size: 16px;
+  transition: border-color 0.3s; 
+  margin-right: 10px;
+}
+
+/* Hover effect for the search input */
+.nav-search-input:hover, .nav-search-input:focus {
+  border-color: navy;
+}
+
 
   

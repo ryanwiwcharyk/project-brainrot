@@ -41,6 +41,7 @@ export default class SearchController {
             message: "Search page retrieved",
             payload: {
                 error: messages,
+                isLoggedIn: req.session.get("isLoggedIn")
             },
             template: "SearchFormView"
         });

@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="{{ styles 'style.css' }}">
-	<link rel="icon" type="image/x-icon" href="../../images/favicon.ico"/>
+	<link rel="icon" type="image/x-icon" href="../../images/favicon.ico" />
 	<title>{{ title }}</title>
 </head>
 
@@ -14,14 +14,22 @@
 		<nav id="nav-header" name="nav-header">
 			<img src="../../images/logo.png" id="logo">
 			<div id="nav-form-holder">
+				<form method="post" action="/search" class="nav-search-form">
+					<input type="search" value="Search for a player" class="nav-search-input" name="username">
+					<select name="platform">
+						<option value="PC">PC</option>
+						<option value="XBOX">XBOX</option>
+						<option value="PSN">PSN</option>
+					</select>
+				</form>
 				<form method="GET" action="/login" class="nav-form">
-				<input type="submit" value="Login" class="nav-button">
+					<input type="submit" value="Login" class="nav-button">
 				</form>
 				<form method="GET" action="/register" class="nav-form">
-				<input type="submit" value="Register" class="nav-button">
+					<input type="submit" value="Register" class="nav-button">
 				</form>
 			</div>
-			
+
 		</nav>
 	</header>
 	<main>
