@@ -1,28 +1,30 @@
 {{> Header }}
 
-<h1>Register</h1>
 
-{{#if error}}
-<p id="error"> {{error}}</p>
-{{/if}}
-<form method="POST" action="/users" id="register-form">
+
+
+<div class="auth-form-container">
+    <form method="POST" action="/users" class="auth-form">
+    <h2>Register</h2>
+    {{#if error}}
+    <p id="error"> {{error}}</p>
+    {{/if}}
         <label>
-            Username
-            <input type="text" name="userName">
-        </label> <br>
+            <input type="text" name="userName" placeholder="Username" class="auth-form-input">
+        </label>
 		<label>
-			Email
-			<input type="text" name="email">
-		</label> <br>
+		    <input type="text" name="email" placeholder="Email"  class="auth-form-input">
+		</label>
         <label>
-            Password
-            <input type="text" name="password">
-        </label> <br>
+            <input type="text" name="password" placeholder="Password"  class="auth-form-input">
+        </label>
         <label>
-            Confirm Password
-            <input type="text" name="confirmPassword">
-        </label><br>
+            <input type="text" name="confirmPassword" placeholder="Confirm password"  class="auth-form-input">
+        </label>
 	
-	<input type="submit" value="Create" id="register-form-submit-button">
-</form>
+	<input type="submit" value="Register" class="form-submit-button">
+	<p>Already have an account?<a href="/login"> Login</a></p>
+    </form>
+</div>
+
 {{> Footer}}
