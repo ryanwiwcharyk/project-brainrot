@@ -97,7 +97,8 @@ export default class UserController {
 	registerPlatformAccount = async (req: Request, res: Response) => {
 		let userId: number = req.session.get("userId");
 		let gameProfileUsername: string = req.session.get("gameProfileUsername");
-		let gameProfile: Profile | null = await Profile.read(this.sql, gameProfileUsername)
+		let gameProfilePlatform: string = req.session.get("gameProfilePlatform");
+		let gameProfile: Profile | null = await Profile.read(this.sql, gameProfileUsername, gameProfilePlatform)
 
 		if (!gameProfile) {
 			await res.send({

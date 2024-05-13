@@ -38,12 +38,13 @@ export default class Profile {
 		return new Profile(sql, convertToCase(snakeToCamel, row) as ProfileProps);
 	}
 
-	static async read(sql: postgres.Sql<any>, username: string) {
+	static async read(sql: postgres.Sql<any>, username: string, platform: string) {
 		const connection = await sql.reserve();
 
 		const [row] = await connection<ProfileProps[]>`
-			SELECT * FROM
-			game_profile WHERE username = ${username}
+			SELECT * FROM game_profile JOIN platform 
+			ON game_profile.platform_id = platform.id
+			WHERE game_profile.username = ${username} AND platform.platform_name = ${platform}
 		`;
 
 		await connection.release();

@@ -71,31 +71,25 @@ export default class SearchController {
         try {
             
             //check db for stats
-            platform = await Platform.read(this.sql, req.body.platform)
-            gameProfile = await Profile.read(this.sql, req.body.username)
-
-            if (!gameProfile) 
+            gameProfile = await Profile.read(this.sql, req.body.username, req.body.platform)
+            
+            //If theres no existing game profile then there wouldnt be a corresponding
+            //player stats so we populate stats given the api.
+            if (gameProfile) 
             {
-                let profileStats: ProfileProps = {
-	                username: req.body.username,
-	                platformId: platform?.props.id
-                };
+                req.session.set("gameProfileId", gameProfile.props.id);
+                req.session.set("gameProfileUsername", gameProfile.props.username);
+                req.session.set("gameProfilePlatform", req.body.platform);
+                res.setCookie(req.session.cookie)
 
-                gameProfile = await Profile.create(this.sql, profileStats)
-            }
-            req.session.set("gameProfileId", gameProfile.props.id);
-            req.session.set("gameProfileUsername", gameProfile.props.username);
-            res.setCookie(req.session.cookie)
-            playerStats = await Stats.read(this.sql, gameProfile.props.id);
-
-            if (playerStats) {
                 await res.send({
                     statusCode: StatusCode.OK,
                     message: "Player stats exist in the database",
                     redirect: `/stats/${req.body.username}`,
                 });
             }
-            else {
+            else
+            {
                 let platformAPIName: string = this.GetPlatformAPIName(req, res);
                 const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + platformAPIName);
                 const stats = await response.json();
@@ -108,11 +102,22 @@ export default class SearchController {
                     });
                     
                 } else {
+                    platform = await Platform.read(this.sql, req.body.platform)
+                    let profileStats: ProfileProps = {
+                        username: req.body.username,
+                        platformId: platform?.props.id
+                    };
+        
+                    gameProfile = await Profile.create(this.sql, profileStats)
+    
+                    req.session.set("gameProfileId", gameProfile.props.id);
+                    req.session.set("gameProfileUsername", gameProfile.props.username);
+                    req.session.set("gameProfilePlatform", req.body.platform);
+                    res.setCookie(req.session.cookie)
+
                     let statsProps: StatsProps = {
                         playerLevel: stats.global.level ?? null,
                         playerKills: stats.total.kills?.value ?? null,
-                        // playerDeaths: stats?.totals?.deaths?.value ?? null,
-                        // killDeathRatio: ,
                         playerDamage: stats.total.damage?.value ?? null,
                         playerWins: stats.total.career_wins?.value ?? null,
                         playerRank: stats.global.rank?.rankName ?? null,
@@ -152,7 +157,7 @@ export default class SearchController {
                 });
             }
             else {
-                let userGameProfile: Profile | null = await Profile.read(this.sql, req.session.get("gameProfileUsername"))
+                let userGameProfile: Profile | null = await Profile.read(this.sql, req.session.get("gameProfileUsername"), req.session.get("gameProfilePlatform"))
                 if (userGameProfile) {
                     if (userGameProfile.props.siteUserId) {
                         await res.send({
