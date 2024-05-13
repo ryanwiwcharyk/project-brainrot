@@ -39,5 +39,14 @@
     <input type="submit" value="Claim" id="search-form-submit-button">
 </form>
 {{/unless}}
+{{#if isLoggedIn}}
+<form method="POST" action="/favourites"> 
+    <label>
+        Add {{name}} to favourites?
+    </label>
+    <input type="hidden" value="{{name}}" name="favouritesName">
+    <input type="submit" value="Favourite" id="favourite-form-submit-button">
+</form>
+{{/if}}
 
 {{> Footer }}

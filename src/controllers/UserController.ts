@@ -22,6 +22,7 @@ export default class UserController {
 	registerRoutes(router: Router) {
 		router.post("/users", this.createUser);
 		router.post("/profile", this.registerPlatformAccount)
+		router.post("/favourites", this.addFavouritesToProfile)
 		router.get("/unlink", this.unlinkPlatformProfile)
 
 		router.get("/users/edit", this.getUserPage);
@@ -95,6 +96,15 @@ export default class UserController {
 	};
 
 	registerPlatformAccount = async (req: Request, res: Response) => {
+		if(!req.session.get("isLoggedIn"))
+		{
+			await res.send({
+				statusCode: StatusCode.Unauthorized,
+				message: "Must be logged in to claim a profile.",
+				redirect: `/login`,
+			});
+			return;
+		}
 		let userId: number = req.session.get("userId");
 		let gameProfileUsername: string = req.session.get("gameProfileUsername");
 		let gameProfilePlatform: string = req.session.get("gameProfilePlatform");
@@ -126,6 +136,35 @@ export default class UserController {
 			redirect: `/stats/${gameProfileUsername}`,
 		});
 
+	}
+	
+	addFavouritesToProfile = async (req: Request, res: Response) => {
+		if(!req.session.get("isLoggedIn"))
+		{
+			await res.send({
+				statusCode: StatusCode.Unauthorized,
+				message: "Must be logged in to favourite a profile.",
+				redirect: `/login`,
+			});
+			return;
+		}
+
+		try {
+			User.FavouritesCreate(this.sql, req.session.get("userId"), req.session.get("gameProfileId"))
+		} catch (error) {
+			await res.send({
+				statusCode: StatusCode.NotFound,
+				message: "Error occured adding account",
+				redirect: `/stats/${req.session.get("gameProfileUsername")}?error=profile_not_found`,
+			});
+			return;
+		}
+
+		await res.send({
+			statusCode: StatusCode.OK,
+			message: "Profile favourited successfully",
+			redirect: `/stats/${req.session.get("gameProfileUsername")}`,
+		});
 	}
 
 	unlinkPlatformProfile = async (req: Request, res: Response) => {

@@ -217,6 +217,7 @@ export default class SearchController {
 
     getLinkedProfileStats = async (req: Request, res: Response) => {
         let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"));
+        let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
 
         if (!gameProfile) {
             await res.send({
@@ -249,6 +250,7 @@ export default class SearchController {
                     wins: profileStats.props.playerWins,
                     rank: profileStats.props.playerRank,
                     isLinked: true,
+                    favourites: favourites,
                     isLoggedIn: req.session.get("isLoggedIn")
                 },
                 template: "StatsView"
