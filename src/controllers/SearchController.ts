@@ -6,6 +6,7 @@ import { createUTCDate } from "../utils";
 import Stats, { StatsProps } from "../models/Stats";
 import Profile, { ProfileProps } from "../models/GameProfile";
 import { Platform, PlatformProps } from "../models/Platform";
+import User from "../models/User";
 
 /**
  * Controller for handling Todo CRUD operations.
@@ -31,21 +32,35 @@ export default class SearchController {
         router.get("/search", this.getSearchForm);
         router.post("/search", this.findPlayerStatistics);
         router.get("/stats/:username", this.getStatisticsPage)
-        router.post("/search/linked", this.getLinkedProfileStats)
+        router.get("/search/linked", this.getLinkedProfileStats)
     }
 
     getSearchForm = async (req: Request, res: Response) => {
         let messages = req.getSearchParams().get("error")
 
-        await res.send({
-            statusCode: StatusCode.OK,
-            message: "Search page retrieved",
-            payload: {
-                error: messages,
-                isLoggedIn: req.session.get("isLoggedIn")
-            },
-            template: "SearchFormView"
-        });
+        if (req.getSearchParams().has("no_user")) {
+            await res.send({
+                statusCode: StatusCode.Unauthorized,
+                message: "Search page retrieved with errors",
+                payload: {
+                    error: "You must be logged in and have linked a platform profile to access stats this way.",
+                    isLoggedIn: req.session.get("isLoggedIn")
+                },
+                template: "SearchFormView"
+            });
+        }
+        else {
+            await res.send({
+                statusCode: StatusCode.OK,
+                message: "Search page retrieved",
+                payload: {
+                    error: messages,
+                    isLoggedIn: req.session.get("isLoggedIn")
+                },
+                template: "SearchFormView"
+            });
+        }
+        
 
     }
     findPlayerStatistics = async (req: Request, res: Response) => {
@@ -124,6 +139,7 @@ export default class SearchController {
     }
     getStatisticsPage = async (req: Request, res: Response) => {
         let gameProfileId: number = req.session.get("gameProfileId")
+        
 
         try {
             let userStats: Stats | null = await Stats.read(this.sql, gameProfileId);
@@ -149,7 +165,8 @@ export default class SearchController {
                                 damage: userStats.props.playerDamage,
                                 wins: userStats.props.playerWins,
                                 rank: userStats.props.playerRank,
-                                isLinked: true
+                                isLinked: userGameProfile.props.siteUserId,
+                                isLoggedIn: req.session.get("isLoggedIn")
                             },
                             template: "StatsView"
                         });
@@ -165,7 +182,8 @@ export default class SearchController {
                                 damage: userStats.props.playerDamage,
                                 wins: userStats.props.playerWins,
                                 rank: userStats.props.playerRank,
-                                isLinked: false
+                                isLinked: await this.UserHasLinkedPlatformProfile(req, res),
+                                isLoggedIn: req.session.get("isLoggedIn")
                             },
                             template: "StatsView"
                         });
@@ -198,8 +216,8 @@ export default class SearchController {
         if (!gameProfile) {
             await res.send({
                 statusCode: StatusCode.NotFound,
-                message: "Could not find game profile.",
-                redirect: "/search?error=try_again"
+                message: "User is not logged in.",
+                redirect: "/search?no_user=not_logged_in"
             });
             return
         }
@@ -245,6 +263,18 @@ export default class SearchController {
         else {
             return "PC"
         }
+    }
+
+    private async UserHasLinkedPlatformProfile(req: Request, res: Response): Promise<boolean> {
+        let loggedInUser: User | null = await User.read(this.sql, req.session.get("userId"))
+        let loggedInUserGameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
+        
+        if (loggedInUserGameProfile?.props.siteUserId && loggedInUserGameProfile.props.siteUserId === loggedInUser?.props.id) {
+            return true
+        }
+
+        return false
+
     }
 
 
