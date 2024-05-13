@@ -1,0 +1,31 @@
+{{> Header }}
+
+<h1>User Profile</h1>
+
+<p id="error">{{ error }}</p>
+
+<form id="edit-profile-form" action="/users/edit" method="POST">
+    <input type="hidden" name="method" value="PUT">
+
+	<label for="email">Email:</label>
+	<input type="text" id="email" name="email" value="{{ email }}"/><br>
+
+    <label for="password">New Password:</label>
+    <input type="text" id="password" name="password"/><br>
+
+    <label for="pic">Profile Picture (URL):</label>
+    <input type="text" id="pic" name="pic"/><br>
+
+    {{#if darkmode}}
+		<input type="checkbox" name="darkmode" id="darkmode" checked="true"></input>
+        <label for="darkmode">Darkmode Enabled</label><br>
+    {{else}}
+        <input type="checkbox" name="darkmode" id="darkmode"></input>
+        <label for="darkmode">Darkmode Enabled</label><br>
+
+	{{/if}}
+
+    <button id="edit-todo-form-submit-button">Edit</button>
+</form>
+
+{{> Footer }}

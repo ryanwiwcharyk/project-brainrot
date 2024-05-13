@@ -152,9 +152,9 @@ export default class UserController {
 			message: "Login retrieved",
 			payload: {
 				error: messages,
-				darkmode: dark,
+				//darkmode: dark,
 				pic: pic,
-				loggedIn: session.get("loggedIn"),
+				loggedIn: session.get("isLoggedIn"),
 			},
 			template: "EditProfileView"
 		});
@@ -178,7 +178,7 @@ export default class UserController {
 			userProps.email = req.body.email
 		}
 		if(req.body.pic){
-			userProps.profile = req.body.pic
+			userProps.profilePicture = req.body.pic
 		}
 		if(req.body.password){
 			userProps.password = req.body.password
