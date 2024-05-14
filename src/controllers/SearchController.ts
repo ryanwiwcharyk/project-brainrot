@@ -8,6 +8,7 @@ import Profile, { ProfileProps } from "../models/GameProfile";
 import { Platform, PlatformProps } from "../models/Platform";
 import User from "../models/User";
 import { ResolvedResult } from "vite/runtime";
+import { platform } from "os";
 
 /**
  * Controller for handling Todo CRUD operations.
@@ -156,7 +157,7 @@ export default class SearchController {
             });
         }
     }
-    getStatisticsPage = async (req: Request, res: Response) => {
+getStatisticsPage = async (req: Request, res: Response) => {
         let gameProfileId: number = req.session.get("gameProfileId")
         let isFavourite = false;
 
@@ -178,7 +179,10 @@ export default class SearchController {
                 });
             }
             else {
-                let userGameProfile: Profile | null = await Profile.read(this.sql, req.session.get("gameProfileUsername"), req.session.get("gameProfilePlatform"))
+                let gameProfileUsername = req.session.get("gameProfileUsername");
+                let gameProfilePlatform = req.session.get("gameProfilePlatform")
+
+                let userGameProfile = await Profile.read(this.sql, gameProfileUsername, gameProfilePlatform)
                 if (userGameProfile) {
                     let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
                     if (favourites) {
@@ -196,6 +200,7 @@ export default class SearchController {
                             payload: {
                                 darkmode: dark,
                                 isFavourite: isFavourite,
+                                favouritesPlatform: gameProfilePlatform,
                                 name: userGameProfile.props.username,
                                 level: userStats.props.playerLevel,
                                 kills: userStats.props.playerKills,
@@ -329,6 +334,15 @@ export default class SearchController {
                 redirect: "/search?no_user=not_logged_in"
             });
             return
+        }
+        else if(gameProfile.props.platformId){
+            let platform = await Platform.readFromId(this.sql, gameProfile.props.platformId)
+            if(platform){
+                req.session.set("gameProfileId", gameProfile.props.id);
+                req.session.set("gameProfileUsername", gameProfile.props.username);
+                req.session.set("gameProfilePlatform", platform.props.platformName);
+                res.setCookie(req.session.cookie)
+            }
         }
 
         let profileStats: Stats | null = await Stats.read(this.sql, gameProfile?.props.id);

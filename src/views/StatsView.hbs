@@ -9,7 +9,7 @@
         {{#if isLoggedIn}}
         <div class="favourite-container">
             <form method="POST" action="/favourites" id="favourite-form">
-                <input type="hidden" value="{{name}}" name="favouritesName">
+                <input type="hidden" value="{{favouritesPlatform}}" name="favouritesPlatform">
                 {{#if isFavourite}}
                     <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox" onchange="this.form.submit()" checked="{{isFavourite}}">
                 {{else}}
