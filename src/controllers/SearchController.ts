@@ -40,13 +40,18 @@ export default class SearchController {
 
     getSearchForm = async (req: Request, res: Response) => {
         let messages = req.getSearchParams().get("error")
-        let mapData = await this.GetMapDataFromAPI(req,res)
+        let darkmode = req.findCookie("darkmode")?.value
+        let dark = false
+        if (darkmode == "dark") {
+            dark = true
+        }        let mapData = await this.GetMapDataFromAPI(req,res)
 
         if (req.getSearchParams().has("no_user")) {
             await res.send({
                 statusCode: StatusCode.Unauthorized,
                 message: "Search page retrieved with errors",
                 payload: {
+                    darkmode: dark,
                     error: "You must be logged in and have linked a platform profile to access stats this way.",
                     isLoggedIn: req.session.get("isLoggedIn"),
                     currentMapName: mapData.current.map,
@@ -62,6 +67,7 @@ export default class SearchController {
                 statusCode: StatusCode.OK,
                 message: "Search page retrieved",
                 payload: {
+                    darkmode: dark,
                     error: messages,
                     isLoggedIn: req.session.get("isLoggedIn"),
                     currentMapName: mapData.current.map,
@@ -72,23 +78,22 @@ export default class SearchController {
                 template: "SearchFormView"
             });
         }
-        
+
 
     }
     findPlayerStatistics = async (req: Request, res: Response) => {
         let platform: Platform | null = null;
         let gameProfile: Profile | null = null;
         let playerStats: Stats | null = null;
-        
+
         try {
-            
+
             //check db for stats
             gameProfile = await Profile.read(this.sql, req.body.username, req.body.platform)
-            
+
             //If theres no existing game profile then there wouldnt be a corresponding
             //player stats so we populate stats given the api.
-            if (gameProfile) 
-            {
+            if (gameProfile) {
                 req.session.set("gameProfileId", gameProfile.props.id);
                 req.session.set("gameProfileUsername", gameProfile.props.username);
                 req.session.set("gameProfilePlatform", req.body.platform);
@@ -100,28 +105,26 @@ export default class SearchController {
                     redirect: `/stats/${req.body.username}`,
                 });
             }
-            else
-            {
+            else {
                 let platformAPIName: string = this.GetPlatformAPIName(req, res);
                 const response = await fetch(`https://api.mozambiquehe.re/bridge?auth=${this.apiKey}&player=${req.body.username}&platform=${platformAPIName}`);
                 const stats = await response.json();
-                if(stats.Error)
-                {
+                if (stats.Error) {
                     await res.send({
                         statusCode: StatusCode.NotFound,
                         message: "Player not found in API",
                         redirect: `/search?error=player_not_found`,
                     });
-                    
+
                 } else {
                     platform = await Platform.read(this.sql, req.body.platform)
                     let profileStats: ProfileProps = {
                         username: req.body.username,
                         platformId: platform?.props.id
                     };
-        
+
                     gameProfile = await Profile.create(this.sql, profileStats)
-    
+
                     req.session.set("gameProfileId", gameProfile.props.id);
                     req.session.set("gameProfileUsername", gameProfile.props.username);
                     req.session.set("gameProfilePlatform", req.body.platform);
@@ -135,7 +138,7 @@ export default class SearchController {
                         playerRank: stats.global.rank?.rankName ?? null,
                         profileId: gameProfile.props.id
                     };
-        
+
                     playerStats = await Stats.create(this.sql, statsProps)
                     await res.send({
                         statusCode: StatusCode.Created,
@@ -144,9 +147,8 @@ export default class SearchController {
                     });
                 }
             }
-        } 
-        catch (error) 
-        {
+        }
+        catch (error) {
             await res.send({
                 statusCode: StatusCode.BadRequest,
                 message: "Error requesting information. The API might be down",
@@ -156,13 +158,19 @@ export default class SearchController {
     }
     getStatisticsPage = async (req: Request, res: Response) => {
         let gameProfileId: number = req.session.get("gameProfileId")
-        
+        let isFavourite = false;
+
+        let darkmode = req.findCookie("darkmode")?.value
+        let dark = false
+        if (darkmode == "dark") {
+            dark = true
+        }
 
         try {
             let userStats: Stats | null = await Stats.read(this.sql, gameProfileId);
             let userStatsHistory: StatsHistory[] | null = await StatsHistory.readStatsHistory(this.sql, gameProfileId)
 
-            if(!userStats) {
+            if (!userStats) {
                 await res.send({
                     statusCode: StatusCode.NotFound,
                     message: "Could not retrieve user stats.",
@@ -172,11 +180,22 @@ export default class SearchController {
             else {
                 let userGameProfile: Profile | null = await Profile.read(this.sql, req.session.get("gameProfileUsername"), req.session.get("gameProfilePlatform"))
                 if (userGameProfile) {
+                    let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
+                    if (favourites) {
+                        favourites.forEach(element => {
+                            if (element.props.username == userGameProfile.props.username) {
+                                isFavourite = true
+                            }
+                        });
+                    }
+
                     if (userGameProfile.props.siteUserId) {
                         await res.send({
                             statusCode: StatusCode.OK,
                             message: "Stats page retrieved",
                             payload: {
+                                darkmode: dark,
+                                isFavourite: isFavourite,
                                 name: userGameProfile.props.username,
                                 level: userStats.props.playerLevel,
                                 kills: userStats.props.playerKills,
@@ -195,6 +214,8 @@ export default class SearchController {
                             statusCode: StatusCode.OK,
                             message: "Stats page retrieved",
                             payload: {
+                                darkmode: dark,
+                                isFavourite: isFavourite,
                                 name: userGameProfile.props.username,
                                 level: userStats.props.playerLevel,
                                 kills: userStats.props.playerKills,
@@ -216,9 +237,9 @@ export default class SearchController {
                         redirect: "/search?error=try_again"
                     });
                 }
-                
+
             }
-            
+
 
         } catch (error) {
             await res.send({
@@ -227,37 +248,37 @@ export default class SearchController {
                 redirect: "/search?error=try_again"
             });
         }
-        
+
     }
 
     redirectToStatsPage = async (req: Request, res: Response) => {
         let gameProfile: Profile | null = null;
         let platform: Platform | null = null;
         let queryParams = req.getSearchParams()
-        const favouriteUsername : string = queryParams.get('favouriteUsername')?? "";
-        const favouritePlatform : number = Number(queryParams.get('favouritePlatform')?? "");
+        const favouriteUsername: string = queryParams.get('favouriteUsername') ?? "";
+        const favouritePlatform: number = Number(queryParams.get('favouritePlatform') ?? "");
 
         let session = req.getSession();
-		if (!session.get("userId")) {
-			await res.send({
-				statusCode: StatusCode.Unauthorized,
-				message: "Unauthorized",
-				redirect: `/login`,
-			});
-			return
-		}
-        
+        if (!session.get("userId")) {
+            await res.send({
+                statusCode: StatusCode.Unauthorized,
+                message: "Unauthorized",
+                redirect: `/login`,
+            });
+            return
+        }
+
         try {
             platform = await Platform.readFromId(this.sql, favouritePlatform)
-            if(platform){
+            if (platform) {
                 gameProfile = await Profile.read(this.sql, favouriteUsername, platform?.props.platformName)
-                if(gameProfile){
+                if (gameProfile) {
                     req.session.set("gameProfileId", gameProfile.props.id);
                     req.session.set("gameProfileUsername", favouriteUsername);
                     req.session.set("gameProfilePlatform", platform?.props.platformName);
                     res.setCookie(req.session.cookie)
                 }
-                else{
+                else {
                     //Gameprofile not found
                     await res.send({
                         statusCode: StatusCode.NotFound,
@@ -272,7 +293,7 @@ export default class SearchController {
                     redirect: `/stats/${req.body.favouriteUsername}`,
                 });
             }
-            else{
+            else {
                 //platform not found
                 await res.send({
                     statusCode: StatusCode.NotFound,
@@ -293,7 +314,13 @@ export default class SearchController {
 
     getLinkedProfileStats = async (req: Request, res: Response) => {
         let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"));
-        //let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
+        let isFavourite = false
+
+        let darkmode = req.findCookie("darkmode")?.value
+        let dark = false
+        if (darkmode == "dark") {
+            dark = true
+        }
 
         if (!gameProfile) {
             await res.send({
@@ -315,10 +342,20 @@ export default class SearchController {
             return
         }
         else {
+            let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
+                    if (favourites) {
+                        favourites.forEach(element => {
+                            if (element.props.username == gameProfile.props.username) {
+                                isFavourite = true
+                            }
+                        });
+                    }
             await res.send({
                 statusCode: StatusCode.OK,
                 message: "Stats page retrieved",
                 payload: {
+                    darkmode: dark,
+                    isFavourite: isFavourite,
                     name: gameProfile.props.username,
                     level: profileStats.props.playerLevel,
                     kills: profileStats.props.playerKills,
@@ -326,7 +363,6 @@ export default class SearchController {
                     wins: profileStats.props.playerWins,
                     rank: profileStats.props.playerRank,
                     isLinked: true,
-                    //favourites: favourites,
                     isLoggedIn: req.session.get("isLoggedIn")
                 },
                 template: "StatsView"
@@ -351,7 +387,7 @@ export default class SearchController {
     private async UserHasLinkedPlatformProfile(req: Request, res: Response): Promise<boolean> {
         let loggedInUser: User | null = await User.read(this.sql, req.session.get("userId"))
         let loggedInUserGameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
-        
+
         if (loggedInUserGameProfile?.props.siteUserId && loggedInUserGameProfile.props.siteUserId === loggedInUser?.props.id) {
             return true
         }

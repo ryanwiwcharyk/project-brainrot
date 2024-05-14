@@ -29,9 +29,17 @@ export default class Controller {
 	}
 
 	getHome = async (req: Request, res: Response) => {
+		let darkmode = req.findCookie("darkmode")?.value
+		let dark = false
+		if (darkmode == "dark") {
+			dark = true
+		}
 		await res.send({
 			statusCode: StatusCode.OK,
 			message: "ok",
+			payload: {
+				darkmode: dark
+			},
 			template: "HomeView"
 		})
 	}

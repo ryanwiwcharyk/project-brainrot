@@ -7,7 +7,10 @@ body {
     font-family: Arial, Tahoma, Serif;
     color: #263238;
   }  
-
+h1{
+  display: flex;
+  align-items: center;
+}
   #nav-header {
     background-color: rgb(4, 10, 45);;
     padding: 10px 20px; /* Adjust padding as needed */
@@ -51,6 +54,30 @@ body {
     height: auto;
   }
 
+  .favourite-container {
+    display: flex;
+    align-items: center;
+}
+
+#favourite-form {
+    display: inline;
+}
+
+.favourite-checkbox {
+    display: none; /* Hide the actual checkbox */
+}
+
+.favourite-star {
+    font-size: 2em;
+    color: grey;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.favourite-checkbox:checked + .favourite-star {
+    color: gold;
+}
+
   .container {
     max-width: 600px;
     margin: 20px auto;
@@ -61,7 +88,8 @@ body {
 }
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    /* grid-template-columns: repeat(2, 1fr); */
+    flex-direction: column;
     grid-gap: 10px;
 }
 .grid-item {
@@ -92,6 +120,8 @@ body {
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   text-align: center; 
+  display:  flex;
+  flex-direction: column;
 }
 
 /* Styling the form headings */
@@ -121,8 +151,11 @@ label {
   box-sizing: border-box;
 }
 
+.favourites-form{
+  margin: 3px;
+}
 /* Styling the submit button */
-.form-submit-button {
+.form-submit-button, .favourites-form {
   background-color: navy;
   color: #fff;
   border: none;
@@ -179,6 +212,10 @@ p {
   font-size: 16px;
   transition: border-color 0.3s; 
   margin-right: 10px;
+}
+.stats-header{
+  display: flex;
+  flex-direction: row;
 }
 
 /* Hover effect for the search input */
@@ -463,3 +500,5 @@ body {
   text-align: left;
 }
   
+
+

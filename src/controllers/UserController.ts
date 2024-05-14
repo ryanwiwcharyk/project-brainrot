@@ -55,6 +55,11 @@ export default class UserController {
 		else if (req.body["password"] === req.body["confirmPassword"]) {
 			try {
 				user = await User.create(this.sql, userProps);
+				let darkmode = req.findCookie("darkmode")?.value
+				let dark = false
+				if (darkmode == "dark") {
+					dark = true
+				}
 
 				await res.send({
 					statusCode: StatusCode.Created,
@@ -62,7 +67,8 @@ export default class UserController {
 					redirect: "/login",
 					template: "LoginFormView",
 					payload: {
-						user: user.props
+						user: user.props,
+						darkmode: dark
 					}
 				});
 			} catch (error) {
@@ -146,29 +152,30 @@ export default class UserController {
 			});
 			return;
 		}
-
 		try {
 			let userId = req.session.get("userId")
 			let gameProfileId = req.session.get("gameProfileId")
 
-			let favourites = await User.FavouritesReadAll(this.sql, userId)
-			let flag = false
-			favourites.forEach(element => {
-				if (element.props.id == gameProfileId) {
-					flag = true
-				}
-			});
+			const isChecked = req.body.checkbox
+			if (isChecked) {
+				await User.FavouritesCreate(this.sql, userId, gameProfileId)
 
-			if(flag){
 				await res.send({
-					statusCode: StatusCode.BadRequest,
-					message: "Favourites already added.",
-					redirect: `/stats/${req.session.get("gameProfileUsername")}?error=favourites_already_added`,
+					statusCode: StatusCode.OK,
+					message: "Profile favourited successfully",
+					redirect: `/stats/${req.session.get("gameProfileUsername")}`,
 				});
-				return;
+				return
 			}
-
-			await User.FavouritesCreate(this.sql, userId, gameProfileId)
+			else {
+				await User.FavouritesDelete(this.sql, userId, gameProfileId)
+				await res.send({
+					statusCode: StatusCode.OK,
+					message: "Profile unfavourited successfully",
+					redirect: `/stats/${req.session.get("gameProfileUsername")}`,
+				});
+				return
+			}
 		} catch (error) {
 			await res.send({
 				statusCode: StatusCode.NotFound,
@@ -177,12 +184,6 @@ export default class UserController {
 			});
 			return;
 		}
-
-		await res.send({
-			statusCode: StatusCode.OK,
-			message: "Profile favourited successfully",
-			redirect: `/stats/${req.session.get("gameProfileUsername")}`,
-		});
 	}
 
 	unlinkPlatformProfile = async (req: Request, res: Response) => {
@@ -221,10 +222,6 @@ export default class UserController {
 
 		let userId = req.session.get("userId")
 		let favourites = await User.FavouritesReadAll(this.sql, userId)
-		let object = {}
-		favourites.forEach(element => {
-			
-		});
 
 		let darkmode = req.findCookie("darkmode")?.value
 		let dark = false
@@ -248,7 +245,7 @@ export default class UserController {
 			message: "Login retrieved",
 			payload: {
 				error: messages,
-				//darkmode: dark,
+				darkmode: dark,
 				pic: pic,
 				isLoggedIn: session.get("isLoggedIn"),
 				email: loggedInUser?.props.email,
