@@ -8,7 +8,10 @@ body {
     font-family: Arial, Tahoma, Serif;
     color: #263238;
   }  
-
+h1{
+  display: flex;
+  align-items: center;
+}
   #nav-header {
     background-color: rgb(4, 10, 45);;
     padding: 10px 20px; /* Adjust padding as needed */
@@ -86,7 +89,8 @@ body {
 }
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    /* grid-template-columns: repeat(2, 1fr); */
+    flex-direction: column;
     grid-gap: 10px;
 }
 .grid-item {
@@ -209,6 +213,10 @@ p {
   font-size: 16px;
   transition: border-color 0.3s; 
   margin-right: 10px;
+}
+.stats-header{
+  display: flex;
+  flex-direction: row;
 }
 
 /* Hover effect for the search input */

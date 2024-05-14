@@ -140,7 +140,10 @@
     display: flex;
     align-items: center;
 }
-
+.stats-header{
+    display: flex;
+    flex-direction: row;
+}
 #favourite-form {
     display: inline;
 }
