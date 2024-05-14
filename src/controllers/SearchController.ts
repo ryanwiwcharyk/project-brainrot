@@ -7,6 +7,7 @@ import Stats, { StatsProps } from "../models/Stats";
 import Profile, { ProfileProps } from "../models/GameProfile";
 import { Platform, PlatformProps } from "../models/Platform";
 import User from "../models/User";
+import { ResolvedResult } from "vite/runtime";
 
 /**
  * Controller for handling Todo CRUD operations.
@@ -15,6 +16,7 @@ import User from "../models/User";
  */
 export default class SearchController {
     private sql: postgres.Sql<any>;
+    private readonly apiKey: string = "e38777f38399c07353c55e53bcda5082"
 
     constructor(sql: postgres.Sql<any>) {
         this.sql = sql;
@@ -37,6 +39,7 @@ export default class SearchController {
 
     getSearchForm = async (req: Request, res: Response) => {
         let messages = req.getSearchParams().get("error")
+        let mapData = await this.GetMapDataFromAPI(req,res)
 
         if (req.getSearchParams().has("no_user")) {
             await res.send({
@@ -44,7 +47,11 @@ export default class SearchController {
                 message: "Search page retrieved with errors",
                 payload: {
                     error: "You must be logged in and have linked a platform profile to access stats this way.",
-                    isLoggedIn: req.session.get("isLoggedIn")
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
                 },
                 template: "SearchFormView"
             });
@@ -55,7 +62,11 @@ export default class SearchController {
                 message: "Search page retrieved",
                 payload: {
                     error: messages,
-                    isLoggedIn: req.session.get("isLoggedIn")
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
                 },
                 template: "SearchFormView"
             });
@@ -91,7 +102,7 @@ export default class SearchController {
             else
             {
                 let platformAPIName: string = this.GetPlatformAPIName(req, res);
-                const response = await fetch('https://api.mozambiquehe.re/bridge?auth=e38777f38399c07353c55e53bcda5082&player=' + req.body.username + '&platform=' + platformAPIName);
+                const response = await fetch(`https://api.mozambiquehe.re/bridge?auth=${this.apiKey}&player=${req.body.username}&platform=${platformAPIName}`);
                 const stats = await response.json();
                 if(stats.Error)
                 {
@@ -282,6 +293,12 @@ export default class SearchController {
 
         return false
 
+    }
+
+    private async GetMapDataFromAPI(req: Request, res: Response) {
+        let response = await fetch(`https://api.mozambiquehe.re/maprotation?auth=${this.apiKey}`)
+        let responseJson = await response.json();
+        return responseJson
     }
 
 

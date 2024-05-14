@@ -1,20 +1,79 @@
 {{> Header }}
 
-<h1>Search</h1>
+<div class="search-page">
+	<h1>Search</h1>
+	<div class="search-form">
+		{{#if error}}
+		<p id="error"> {{error}}</p>
+		{{/if}}
+		<form method="POST" action="/search" id="search-form">
 
-{{#if error}}
-<p id="error"> {{error}}</p>
-{{/if}}
-<form method="POST" action="/search" id="search-form">
-	
 
-	<input type="text" name="username" placeholder="Username">
-  	<select name="platform">
-    	<option value="PC">PC</option>
-    	<option value="XBOX">XBOX</option>
-    	<option value="PSN">PSN</option>
-  	</select><br>
-	
-	<input type="submit" value="Search" id="search-form-submit-button">
-</form>
+			<input type="text" name="username" placeholder="Search for a player..." class="nav-search-input">
+			<select name="platform">
+				<option value="PC">PC</option>
+				<option value="XBOX">XBOX</option>
+				<option value="PSN">PSN</option>
+			</select><br>
+
+			<input type="submit" value="Search" id="search-form-submit-button">
+		</form>
+	</div>
+
+	<div class="map-data">
+		{{#if currentMapName}}
+		<div class="card">
+			<div class="card-image-container">
+				{{#if (ifEquals currentMapName "World's Edge")}}
+				<img src="/images/worlds-edge.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals currentMapName "Kings Canyon")}}
+				<img src="/images/kings-canyon.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals currentMapName "Broken Moon")}}
+				<img src="/images/broken-moon.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals currentMapName "Storm Point")}}
+				<img src="/images/storm-point.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals currentMapName "Olympus")}}
+				<img src="/images/olympus.jpg" class="map-data-image">
+				{{/if}}
+			</div>
+			<p class="card-title">{{currentMapName}}</p>
+			<p class="card-des">
+				Time until next map: {{currentMapTimeRemaining}}
+			</p>
+		</div>
+
+		<div class="card">
+			<div class="card-image-container">
+				{{#if (ifEquals nextMapName "World's Edge")}}
+				<img src="/images/worlds-edge.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals nextMapName "Kings Canyon")}}
+				<img src="/images/kings-canyon.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals nextMapName "Broken Moon")}}
+				<img src="/images/broken-moon.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals nextMapName "Storm Point")}}
+				<img src="/images/storm-point.jpg" class="map-data-image">
+				{{/if}}
+				{{#if (ifEquals nextMapName "Olympus")}}
+				<img src="/images/olympus.jpg" class="map-data-image">
+				{{/if}}
+			</div>
+			<p class="card-title">{{nextMapName}}</p>
+			<p class="card-des">
+				Next map start: {{nextMapStart}}
+			</p>
+		</div>
+		{{else}}
+		<p id="error">Could not load map data from API.</p>
+		{{/if}}
+	</div>
+</div>
+
+
 {{> Footer}}
