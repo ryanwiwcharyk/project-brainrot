@@ -6,11 +6,6 @@
 <div class="container">
     <div class="stats-header">
         <h1> {{name}}'s stats</h1>
-        {{#unless isLinked}}
-        <form method="POST" action="/profile">
-            <button type="submit" value="Claim Profile" id="search-form-submit-button"> </button>
-        </form>
-        {{/unless}}
         {{#if isLoggedIn}}
         <div class="favourite-container">
             <form method="POST" action="/favourites" id="favourite-form">
@@ -47,6 +42,12 @@
             <span>{{rank}}</span>
         </div>
     </div>
+    {{#unless isLinked}}
+        <form method="POST" action="/profile">
+            <label for="search-form-submit-button">Is this your profile?</label>
+            <button type="submit" value="Claim" id="search-form-submit-button"> </button>
+        </form>
+    {{/unless}}
 </div>
 
 {{> Footer }}

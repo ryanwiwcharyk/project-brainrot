@@ -42,7 +42,7 @@ export default class Profile {
 		const connection = await sql.reserve();
 
 		const [row] = await connection<ProfileProps[]>`
-			SELECT * FROM game_profile JOIN platform 
+			SELECT game_profile.* FROM game_profile JOIN platform 
 			ON game_profile.platform_id = platform.id
 			WHERE game_profile.username = ${username} AND platform.platform_name = ${platform}
 		`;
