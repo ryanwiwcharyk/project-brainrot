@@ -1,45 +1,63 @@
 {{> Header }}
 
-<h1>User Profile</h1>
 
-<p id="error">{{ error }}</p>
 
-<form id="edit-profile-form" action="/users/edit" method="POST">
-    <input type="hidden" name="method" value="PUT">
+<div class="auth-form-container">
 
-    <label for="username">Username:</label>
-	<input type="text" id="username" name="username" value="{{ username }}"/><br>
+    <!-- Edit Profile Form -->
+    <form id="edit-profile-form" action="/users/edit" method="POST" class="auth-form">
+        <h2>{{username}}'s Profile</h2>
+        <p id="error">{{error}}</p>
+        <input type="hidden" name="method" value="PUT">
 
-	<label for="email">Email:</label>
-	<input type="text" id="email" name="email" value="{{ email }}"/><br>
+        <label>
+            <input type="text" id="username" name="username" value="{{ username }}" placeholder="Username" class="auth-form-input" />
+        </label>
+        <label>
+            <input type="text" id="email" name="email" value="{{ email }}" placeholder="Email" class="auth-form-input"/>
+        </label>
+        <label>
+            <input type="text" id="password" name="password" placeholder="New password" class="auth-form-input"/>
+        </label>
+        <label>
+            <input type="text" id="pic" name="pic" placeholder="Picture URL" class="auth-form-input"/>
+        </label>
 
-    <label for="password">New Password:</label>
-    <input type="text" id="password" name="password"/><br>
+        {{#if darkmode}}
+        <input type="checkbox" name="darkmode" id="darkmode" checked="true"></input>
+        <label for="darkmode">Enable darkmode</label><br>
+        {{else}}
+        <div class="checkbox-container">
+            <input type="checkbox" name="darkmode" id="darkmode" class="form-checkbox"></input>
+            <label for="darkmode" class="form-label">Darkmode Enabled</label><br>
+        </div>
 
-    <label for="pic">Profile Picture (URL):</label>
-    <input type="text" id="pic" name="pic"/><br>
+        {{/if}}
 
-    {{#if darkmode}}
-		<input type="checkbox" name="darkmode" id="darkmode" checked="true"></input>
-        <label for="darkmode">Darkmode Enabled</label><br>
-    {{else}}
-        <input type="checkbox" name="darkmode" id="darkmode"></input>
-        <label for="darkmode">Darkmode Enabled</label><br>
-
-	{{/if}}
-
-    <button id="edit-todo-form-submit-button">Edit</button>
-
-    
-</form>
-
-{{#if gameProfile}}
-    <form action="/unlink" method="GET">
-        <label for="platformUsername">Platform Username:</label>
-        <input type="text" id="platformUsername" name="platformUsername" value="{{gameProfile.props.username}}"/><br>
-        <input type="submit" value="Unlink platform account">
+        <button class="form-submit-button">Edit</button>
     </form>
-    
-    {{/if}}
+
+
+    <div class="edit-form-right-side">
+        <div class="auth-form">
+            <p>favorites here. When i have an object to work with these will be placed evenly.</p>
+        </div>
+        {{#if gameProfile}}
+        <div class="auth-form">
+            <form action="/unlink" method="GET" class="unlink-form" id="unlink-form">
+                <label for="platformUsername">Platform Username:</label>
+                <input type="text" id="platformUsername" name="platformUsername"
+                    value="{{gameProfile.props.username}}" class="auth-form-input"/>
+                <input type="submit" value="Unlink platform account" class="form-submit-button">
+            </form>
+        </div>
+        {{else}}
+        <div class="auth-form">
+            <h2>You do not have any linked platform accounts</h2>
+        </div>
+        {{/if}}
+    </div>
+</div>
+
 
 {{> Footer }}
