@@ -48,6 +48,15 @@
             <button type="submit" value="Claim" id="search-form-submit-button"> </button>
         </form>
     {{/unless}}
+
+    {{#if statsHistory}}
+    {{#each statsHistory}}
+    <p>{{this.props.legendPlayed}}</p>
+    <p>{{this.props.mapPlayed}}</p>
+    {{/each}}
+    {{else}}
+    <p>no session history</p>
+    {{/if}}
 </div>
 
 {{> Footer }}

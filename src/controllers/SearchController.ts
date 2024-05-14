@@ -166,6 +166,21 @@ export default class SearchController {
             dark = true
         }
 
+        if (!gameProfileId) {
+            let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
+            if(gameProfile) {
+                gameProfileId = gameProfile.props.id!
+            }
+            else {
+                await res.send({
+                    statusCode: StatusCode.InternalServerError,
+                    message: "Error getting user profile.",
+                    redirect: `/search?error=try_again`,
+                });
+            }
+            
+        }
+
         try {
             let userStats: Stats | null = await Stats.read(this.sql, gameProfileId);
             let userStatsHistory: StatsHistory[] | null = await StatsHistory.readStatsHistory(this.sql, gameProfileId)
@@ -183,7 +198,7 @@ export default class SearchController {
                     let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
                     if (favourites) {
                         favourites.forEach(element => {
-                            if (element.props.username == userGameProfile.props.username) {
+                            if (element.props.username == userGameProfile!.props.username) {
                                 isFavourite = true
                             }
                         });
@@ -332,6 +347,7 @@ export default class SearchController {
         }
 
         let profileStats: Stats | null = await Stats.read(this.sql, gameProfile?.props.id);
+        let userStatsHistory: StatsHistory[] | null = await StatsHistory.readStatsHistory(this.sql, gameProfile.props.id!)
 
         if (!profileStats) {
             await res.send({
@@ -345,7 +361,7 @@ export default class SearchController {
             let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
                     if (favourites) {
                         favourites.forEach(element => {
-                            if (element.props.username == gameProfile.props.username) {
+                            if (element.props.username == gameProfile!.props.username) {
                                 isFavourite = true
                             }
                         });
@@ -363,7 +379,8 @@ export default class SearchController {
                     wins: profileStats.props.playerWins,
                     rank: profileStats.props.playerRank,
                     isLinked: true,
-                    isLoggedIn: req.session.get("isLoggedIn")
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    statsHistory: userStatsHistory
                 },
                 template: "StatsView"
             });
