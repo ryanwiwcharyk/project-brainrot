@@ -52,6 +52,30 @@ body {
     height: auto;
   }
 
+  .favourite-container {
+    display: flex;
+    align-items: center;
+}
+
+#favourite-form {
+    display: inline;
+}
+
+.favourite-checkbox {
+    display: none; /* Hide the actual checkbox */
+}
+
+.favourite-star {
+    font-size: 2em;
+    color: grey;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.favourite-checkbox:checked + .favourite-star {
+    color: gold;
+}
+
   .container {
     max-width: 600px;
     margin: 20px auto;

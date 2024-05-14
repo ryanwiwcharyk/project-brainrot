@@ -1,10 +1,30 @@
 {{> Header }}
 
 
-<h1> {{name}}'s stats</h1>
 
 
 <div class="container">
+    <div class="stats-header">
+        <h1> {{name}}'s stats</h1>
+        {{#unless isLinked}}
+        <form method="POST" action="/profile">
+            <button type="submit" value="Claim Profile" id="search-form-submit-button"> </button>
+        </form>
+        {{/unless}}
+        {{#if isLoggedIn}}
+        <div class="favourite-container">
+            <form method="POST" action="/favourites" id="favourite-form">
+                <input type="hidden" value="{{name}}" name="favouritesName">
+                {{#if isFavourite}}
+                    <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox" onchange="this.form.submit()" checked="{{isFavourite}}">
+                {{else}}
+                    <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox" onchange="this.form.submit()">
+                {{/if}}
+                <label for="favourite-checkbox" class="favourite-star">&#9733;</label>
+            </form>
+        </div>
+        {{/if}}
+    </div>
     <div class="grid-container">
         <div class="grid-item">
             <span>Level:</span>
@@ -28,25 +48,5 @@
         </div>
     </div>
 </div>
-
-
-
-{{#unless isLinked}}
-<form method="POST" action="/profile"> 
-    <label>
-        Is this your profile?
-    </label>
-    <input type="submit" value="Claim" id="search-form-submit-button">
-</form>
-{{/unless}}
-{{#if isLoggedIn}}
-<form method="POST" action="/favourites"> 
-    <label>
-        Add {{name}} to favourites?
-    </label>
-    <input type="hidden" value="{{name}}" name="favouritesName">
-    <input type="submit" value="Favourite" id="favourite-form-submit-button">
-</form>
-{{/if}}
 
 {{> Footer }}

@@ -136,6 +136,29 @@
     cursor: pointer;
     transition: background-color 0.3s;
   }
+  .favourite-container {
+    display: flex;
+    align-items: center;
+}
+
+#favourite-form {
+    display: inline;
+}
+
+.favourite-checkbox {
+    display: none; /* Hide the actual checkbox */
+}
+
+.favourite-star {
+    font-size: 2em;
+    color: grey;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.favourite-checkbox:checked + .favourite-star {
+    color: gold;
+}
 
   .form-submit-button {
     background-color: #3B82F6;
