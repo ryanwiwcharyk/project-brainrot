@@ -218,6 +218,7 @@ export default class SearchController {
     getLinkedProfileStats = async (req: Request, res: Response) => {
         let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"));
         let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
+        console.log(favourites)
 
         if (!gameProfile) {
             await res.send({

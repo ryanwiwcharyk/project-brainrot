@@ -98,27 +98,24 @@ export default class User {
 		}
 
 	}
-	static async update(
-		sql: postgres.Sql<any>,
+	async update(
 		updateProps: Partial<UserProps>,
-		id: number
-	): Promise<User> {
-		const connection = await sql.reserve();
+	) {
+		const connection = await this.sql.reserve();
 
 		const [row] = await connection`
 		UPDATE users
 		SET
-			${sql(convertToCase(camelToSnake, updateProps))}, edited_at = ${createUTCDate()}
+			${this.sql(convertToCase(camelToSnake, updateProps))}, edited_at = ${createUTCDate()}
 		WHERE
-			id = ${id}
+			id = ${this.props.id}
 		RETURNING *
 		`;
 
 
 		await connection.release();
 
-		return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
-
+		this.props = { ...this.props, ...convertToCase(snakeToCamel, row)}
 	}
 
 	static async read(sql: postgres.Sql<any>, id: number) {
@@ -159,9 +156,10 @@ export default class User {
 		const connection = await sql.reserve();
 
 		const rows: postgres.RowList<ProfileProps[]> = await connection<ProfileProps[]>`
-			SELECT gp.*
-			FROM favourites f JOIN game_profile gp
-            WHERE f.user_id = ${userId} AND f.profile_id = gp.id
+			SELECT game_profile.*
+			FROM favourites JOIN game_profile
+			ON favourites.profile_id = game_profile.id
+            WHERE favourites.user_id = ${userId}
 		`;
 
 		await connection.release();
@@ -181,7 +179,7 @@ export default class User {
 
 
 		const [row] = await connection<UserProps[]>`
-			INSERT INTO favourites
+			INSERT INTO favourites (user_id, profile_id)
 			VALUES(${userId}, ${profileId})
 		`;
 
