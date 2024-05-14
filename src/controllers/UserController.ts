@@ -5,7 +5,7 @@ import Response, { StatusCode } from "../router/Response";
 import View from "../views/View";
 import { URLSearchParams } from "url";
 import Session from "../auth/Session";
-import User, { DuplicateEmailError, DuplicateUsenameError, UserProps } from "../models/User";
+import User, { DuplicateEmailError, DuplicateUsernameError, UserProps } from "../models/User";
 import SessionManager from "../auth/SessionManager";
 import Cookie from "../auth/Cookie";
 import { createUTCDate } from "../utils";
@@ -74,7 +74,7 @@ export default class UserController {
 
 					});
 				}
-				else if (error instanceof DuplicateUsenameError) {
+				else if (error instanceof DuplicateUsernameError) {
 					await res.send({
 						statusCode: StatusCode.BadRequest,
 						message: "User with this username already exists.",

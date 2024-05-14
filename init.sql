@@ -50,12 +50,12 @@ CREATE TABLE stats (
 DROP TABLE IF EXISTS session_stats;
 CREATE TABLE session_stats (
     id SERIAL PRIMARY KEY,
+    legend_played VARCHAR(100),
+    map_played VARCHAR(100),
+    damage_dealt INTEGER
     start_time TIMESTAMP,
     end_time TIMESTAMP,
-    games_played SMALLINT,
     session_kills SMALLINT,
-    session_deaths SMALLINT,
-    session_kill_death DECIMAL(4,2),
     profile_id INTEGER REFERENCES game_profile(id)
 );
 

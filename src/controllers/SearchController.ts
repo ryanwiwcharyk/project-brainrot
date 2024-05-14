@@ -3,7 +3,7 @@ import Request from "../router/Request";
 import Response, { StatusCode } from "../router/Response";
 import Router from "../router/Router";
 import { createUTCDate } from "../utils";
-import Stats, { StatsProps } from "../models/Stats";
+import Stats, { StatsHistory, StatsProps } from "../models/Stats";
 import Profile, { ProfileProps } from "../models/GameProfile";
 import { Platform, PlatformProps } from "../models/Platform";
 import User from "../models/User";
@@ -160,6 +160,7 @@ export default class SearchController {
 
         try {
             let userStats: Stats | null = await Stats.read(this.sql, gameProfileId);
+            let userStatsHistory: StatsHistory[] | null = await StatsHistory.readStatsHistory(this.sql, gameProfileId)
 
             if(!userStats) {
                 await res.send({
@@ -183,7 +184,8 @@ export default class SearchController {
                                 wins: userStats.props.playerWins,
                                 rank: userStats.props.playerRank,
                                 isLinked: userGameProfile.props.siteUserId,
-                                isLoggedIn: req.session.get("isLoggedIn")
+                                isLoggedIn: req.session.get("isLoggedIn"),
+                                statsHistory: userStatsHistory
                             },
                             template: "StatsView"
                         });
@@ -200,7 +202,8 @@ export default class SearchController {
                                 wins: userStats.props.playerWins,
                                 rank: userStats.props.playerRank,
                                 isLinked: await this.UserHasLinkedPlatformProfile(req, res),
-                                isLoggedIn: req.session.get("isLoggedIn")
+                                isLoggedIn: req.session.get("isLoggedIn"),
+                                statsHistory: userStatsHistory
                             },
                             template: "StatsView"
                         });
