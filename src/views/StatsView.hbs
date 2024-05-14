@@ -9,7 +9,7 @@
         {{#if isLoggedIn}}
         <div class="favourite-container">
             <form method="POST" action="/favourites" id="favourite-form">
-                <input type="hidden" value="{{name}}" name="favouritesName">
+                <input type="hidden" value="{{favouritesPlatform}}" name="favouritesPlatform">
                 {{#if isFavourite}}
                     <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox" onchange="this.form.submit()" checked="{{isFavourite}}">
                 {{else}}
@@ -43,9 +43,8 @@
         </div>
     </div>
     {{#unless isLinked}}
-        <form method="POST" action="/profile">
-            <label for="search-form-submit-button">Is this your profile?</label>
-            <button type="submit" value="Claim" id="search-form-submit-button"> </button>
+        <form method="POST" action="/profile" >
+            <input type="submit" value="Claim Profile" class="form-submit-button">
         </form>
     {{/unless}}
 
