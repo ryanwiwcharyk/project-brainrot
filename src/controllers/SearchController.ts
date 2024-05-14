@@ -34,6 +34,7 @@ export default class SearchController {
         router.get("/search", this.getSearchForm);
         router.post("/search", this.findPlayerStatistics);
         router.get("/stats/:username", this.getStatisticsPage)
+        router.get("/redirect/:username", this.redirectToStatsPage)
         router.get("/search/linked", this.getLinkedProfileStats)
     }
 
@@ -78,7 +79,7 @@ export default class SearchController {
         let platform: Platform | null = null;
         let gameProfile: Profile | null = null;
         let playerStats: Stats | null = null;
-    
+        
         try {
             
             //check db for stats
@@ -224,6 +225,67 @@ export default class SearchController {
             });
         }
         
+    }
+
+    redirectToStatsPage = async (req: Request, res: Response) => {
+        let gameProfile: Profile | null = null;
+        let platform: Platform | null = null;
+        let queryParams = req.getSearchParams()
+        const favouriteUsername : string = queryParams.get('favouriteUsername')?? "";
+        const favouritePlatform : number = Number(queryParams.get('favouritePlatform')?? "");
+
+        let session = req.getSession();
+		if (!session.get("userId")) {
+			await res.send({
+				statusCode: StatusCode.Unauthorized,
+				message: "Unauthorized",
+				redirect: `/login`,
+			});
+			return
+		}
+        
+        try {
+            platform = await Platform.readFromId(this.sql, favouritePlatform)
+            if(platform){
+                gameProfile = await Profile.read(this.sql, favouriteUsername, platform?.props.platformName)
+                if(gameProfile){
+                    req.session.set("gameProfileId", gameProfile.props.id);
+                    req.session.set("gameProfileUsername", favouriteUsername);
+                    req.session.set("gameProfilePlatform", platform?.props.platformName);
+                    res.setCookie(req.session.cookie)
+                }
+                else{
+                    //Gameprofile not found
+                    await res.send({
+                        statusCode: StatusCode.NotFound,
+                        message: "Profile not found.",
+                        redirect: "/search?error=profile_not_found"
+                    });
+                    return;
+                }
+                await res.send({
+                    statusCode: StatusCode.OK,
+                    message: "Session updated.",
+                    redirect: `/stats/${req.body.favouriteUsername}`,
+                });
+            }
+            else{
+                //platform not found
+                await res.send({
+                    statusCode: StatusCode.NotFound,
+                    message: "Platform not found.",
+                    redirect: "/search?error=platform_not_found"
+                });
+                return
+            }
+        } catch (error) {
+            await res.send({
+                statusCode: StatusCode.BadRequest,
+                message: "Error getting getting information from the database.",
+                redirect: "/search?error=try_again"
+            });
+            return
+        }
     }
 
     getLinkedProfileStats = async (req: Request, res: Response) => {

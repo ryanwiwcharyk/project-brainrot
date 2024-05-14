@@ -96,8 +96,7 @@ export default class UserController {
 	};
 
 	registerPlatformAccount = async (req: Request, res: Response) => {
-		if(!req.session.get("isLoggedIn"))
-		{
+		if (!req.session.get("isLoggedIn")) {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
 				message: "Must be logged in to claim a profile.",
@@ -137,10 +136,9 @@ export default class UserController {
 		});
 
 	}
-	
+
 	addFavouritesToProfile = async (req: Request, res: Response) => {
-		if(!req.session.get("isLoggedIn"))
-		{
+		if (!req.session.get("isLoggedIn")) {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
 				message: "Must be logged in to favourite a profile.",
@@ -150,7 +148,27 @@ export default class UserController {
 		}
 
 		try {
-			User.FavouritesCreate(this.sql, req.session.get("userId"), req.session.get("gameProfileId"))
+			let userId = req.session.get("userId")
+			let gameProfileId = req.session.get("gameProfileId")
+
+			let favourites = await User.FavouritesReadAll(this.sql, userId)
+			let flag = false
+			favourites.forEach(element => {
+				if (element.props.id == gameProfileId) {
+					flag = true
+				}
+			});
+
+			if(flag){
+				await res.send({
+					statusCode: StatusCode.BadRequest,
+					message: "Favourites already added.",
+					redirect: `/stats/${req.session.get("gameProfileUsername")}?error=favourites_already_added`,
+				});
+				return;
+			}
+
+			await User.FavouritesCreate(this.sql, userId, gameProfileId)
 		} catch (error) {
 			await res.send({
 				statusCode: StatusCode.NotFound,
@@ -201,6 +219,13 @@ export default class UserController {
 		let loggedInUser: User | null = await User.read(this.sql, req.session.get("userId"))
 		let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
 
+		let userId = req.session.get("userId")
+		let favourites = await User.FavouritesReadAll(this.sql, userId)
+		let object = {}
+		favourites.forEach(element => {
+			
+		});
+
 		let darkmode = req.findCookie("darkmode")?.value
 		let dark = false
 		if (darkmode == "dark") {
@@ -228,6 +253,7 @@ export default class UserController {
 				isLoggedIn: session.get("isLoggedIn"),
 				email: loggedInUser?.props.email,
 				username: loggedInUser?.props.userName,
+				favourites: favourites,
 				gameProfile: gameProfile
 			},
 			template: "EditProfileView"
@@ -235,7 +261,6 @@ export default class UserController {
 	}
 	updateUser = async (req: Request, res: Response) => {
 		let session = req.getSession();
-		let userProps: Partial<UserProps> = {}
 		if (!session.get("userId")) {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
@@ -245,23 +270,25 @@ export default class UserController {
 			return
 		}
 
-		let id = session.get("userId")
-
+		let props: Partial<UserProps> = {}
+		if (req.body.username) {
+			props.userName = req.body.username
+		}
 		if (req.body.email) {
-			userProps.email = req.body.email
+			props.email = req.body.email
 		}
 		if (req.body.pic) {
-			userProps.profilePicture = req.body.pic
+			props.profilePicture = req.body.pic
 		}
 		if (req.body.password) {
-			userProps.password = req.body.password
+			props.password = req.body.password
 		}
 		if (!req.body.password && !req.body.pic && !req.body.email && req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "dark"))
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
-				redirect: "/users/edit?error=lacking_info"
+				redirect: "/users/edit"
 			});
 		}
 		if (!req.body.password && !req.body.pic && !req.body.email && !req.body.darkmode) {
@@ -269,37 +296,49 @@ export default class UserController {
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
-				redirect: "/users/edit?error=lacking_info"
+				redirect: "/users/edit"
 			});
 		}
-
 		try {
-			let user: User = await User.update(this.sql, userProps, id)
+			let id = session.get("userId")
+			let user: User | null = await User.read(this.sql, id)
 
-			if (req.body.darkmode) {
-				res.setCookie(new Cookie("darkmode", "dark"))
+			if (!user) {
+				await res.send({
+					statusCode: StatusCode.BadRequest,
+					message: "Error retrieving info from database",
+					redirect: "/users/edit?error=try_again"
+				});
 			}
 			else {
-				res.setCookie(new Cookie("darkmode", "light"))
-			}
+				await user.update(props)
 
-			if (req.body.pic) {
-				res.setCookie(new Cookie("pic", req.body.pic))
-			}
+				if (req.body.darkmode) {
+					res.setCookie(new Cookie("darkmode", "dark"))
+				}
+				else {
+					res.setCookie(new Cookie("darkmode", "light"))
+				}
 
-			await res.send({
-				statusCode: StatusCode.OK,
-				message: "User updated successfully!",
-				redirect: "/users/edit?error=lacking_info"
-			});
+				if (req.body.pic) {
+					res.setCookie(new Cookie("pic", req.body.pic))
+				}
+
+				await res.send({
+					statusCode: StatusCode.OK,
+					message: "User updated successfully!",
+					redirect: "/users/edit"
+				});
+			}
 		}
 		catch {
 			await res.send({
 				statusCode: StatusCode.BadRequest,
 				message: "User with this email already exists.",
-				redirect: "/users/edit?error=lacking_info"
+				redirect: "/users/edit?error=already_exists"
 			});
 		}
+
 
 	};
 }

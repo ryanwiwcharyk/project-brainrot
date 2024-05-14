@@ -39,8 +39,26 @@
 
 
     <div class="edit-form-right-side">
-        <div class="auth-form">
-            <p>favorites here. When i have an object to work with these will be placed evenly.</p>
+        <div class="auth-form" id="left-align">
+            <p>Favourites:</p>
+            {{#if favourites}}
+                <ul>
+                    {{#each favourites}}
+                        <li>
+                            <form action="/redirect/{{props.username}}" method="GET" style="display:inline;">
+                                <input type="hidden" name="favouriteUsername" value="{{props.username}}">
+                                <input type="hidden" name="favouritePlatform" value="{{props.platformId}}">
+                                <button type="submit" style="background:none;border:none;color:blue;text-decoration:underline;cursor:pointer;">
+                                    {{props.username}}
+                                </button>
+
+                            </form>
+                        </li>
+                    {{/each}}
+                </ul>
+            {{else}}
+                <p>No favorites found.</p>
+            {{/if}}
         </div>
         {{#if gameProfile}}
         <div class="auth-form">
