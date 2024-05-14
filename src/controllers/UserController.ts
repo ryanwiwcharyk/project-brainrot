@@ -219,6 +219,13 @@ export default class UserController {
 		let loggedInUser: User | null = await User.read(this.sql, req.session.get("userId"))
 		let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
 
+		let userId = req.session.get("userId")
+		let favourites = await User.FavouritesReadAll(this.sql, userId)
+		let object = {}
+		favourites.forEach(element => {
+			
+		});
+
 		let darkmode = req.findCookie("darkmode")?.value
 		let dark = false
 		if (darkmode == "dark") {
@@ -246,6 +253,7 @@ export default class UserController {
 				isLoggedIn: session.get("isLoggedIn"),
 				email: loggedInUser?.props.email,
 				username: loggedInUser?.props.userName,
+				favourites: favourites,
 				gameProfile: gameProfile
 			},
 			template: "EditProfileView"
