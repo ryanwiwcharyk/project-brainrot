@@ -150,7 +150,25 @@ export default class UserController {
 		try {
 			let userId = req.session.get("userId")
 			let gameProfileId = req.session.get("gameProfileId")
-			User.FavouritesCreate(this.sql, userId, gameProfileId)
+
+			let favourites = await User.FavouritesReadAll(this.sql, userId)
+			let flag = false
+			favourites.forEach(element => {
+				if (element.props.id == gameProfileId) {
+					flag = true
+				}
+			});
+
+			if(flag){
+				await res.send({
+					statusCode: StatusCode.BadRequest,
+					message: "Favourites already added.",
+					redirect: `/stats/${req.session.get("gameProfileUsername")}?error=favourites_already_added`,
+				});
+				return;
+			}
+
+			await User.FavouritesCreate(this.sql, userId, gameProfileId)
 		} catch (error) {
 			await res.send({
 				statusCode: StatusCode.NotFound,
@@ -245,7 +263,7 @@ export default class UserController {
 		}
 
 		let props: Partial<UserProps> = {}
-		if(req.body.username){
+		if (req.body.username) {
 			props.userName = req.body.username
 		}
 		if (req.body.email) {

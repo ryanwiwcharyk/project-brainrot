@@ -158,6 +158,8 @@ export default class SearchController {
             }
             else {
                 let userGameProfile: Profile | null = await Profile.read(this.sql, req.session.get("gameProfileUsername"), req.session.get("gameProfilePlatform"))
+                let userId = req.session.get("userId")
+			    let favourites = await User.FavouritesReadAll(this.sql, userId)
                 if (userGameProfile) {
                     if (userGameProfile.props.siteUserId) {
                         await res.send({
@@ -170,6 +172,7 @@ export default class SearchController {
                                 damage: userStats.props.playerDamage,
                                 wins: userStats.props.playerWins,
                                 rank: userStats.props.playerRank,
+                                favourites: favourites,
                                 isLinked: userGameProfile.props.siteUserId,
                                 isLoggedIn: req.session.get("isLoggedIn")
                             },
@@ -187,6 +190,7 @@ export default class SearchController {
                                 damage: userStats.props.playerDamage,
                                 wins: userStats.props.playerWins,
                                 rank: userStats.props.playerRank,
+                                favourites: favourites,
                                 isLinked: await this.UserHasLinkedPlatformProfile(req, res),
                                 isLoggedIn: req.session.get("isLoggedIn")
                             },
