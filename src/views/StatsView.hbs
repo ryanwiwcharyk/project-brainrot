@@ -43,9 +43,8 @@
         </div>
     </div>
     {{#unless isLinked}}
-        <form method="POST" action="/profile">
-            <label for="search-form-submit-button">Is this your profile?</label>
-            <button type="submit" value="Claim" id="search-form-submit-button"> </button>
+        <form method="POST" action="/profile" >
+            <input type="submit" value="Claim Profile" class="form-submit-button">
         </form>
     {{/unless}}
 </div>
