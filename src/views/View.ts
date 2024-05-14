@@ -48,6 +48,10 @@ export default class View {
 		handlebars.registerHelper("formatDate", function (date) {
 			return formatDateToISO(date); // Format as 'YYYY-MM-DD'
 		});
+
+		handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+			return (arg1 == arg2);
+		});
 	}
 
 	/**

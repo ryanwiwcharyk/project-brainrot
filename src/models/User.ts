@@ -30,7 +30,7 @@ export class InvalidCredentialsError extends Error {
 	}
 }
 
-export class DuplicateUsenameError extends Error {
+export class DuplicateUsernameError extends Error {
 	constructor() {
 		super("This username is taken. Please try again.")
 	}
@@ -84,7 +84,7 @@ export default class User {
 			throw new DuplicateEmailError();
 		}
 		else if (userName.count !== 0) {
-			throw new DuplicateUsenameError();
+			throw new DuplicateUsernameError();
 		}
 		else {
 			const [row] = await connection<UserProps[]>`
