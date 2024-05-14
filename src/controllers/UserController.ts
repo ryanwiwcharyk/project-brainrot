@@ -55,6 +55,11 @@ export default class UserController {
 		else if (req.body["password"] === req.body["confirmPassword"]) {
 			try {
 				user = await User.create(this.sql, userProps);
+				let darkmode = req.findCookie("darkmode")?.value
+				let dark = false
+				if (darkmode == "dark") {
+					dark = true
+				}	
 
 				await res.send({
 					statusCode: StatusCode.Created,
@@ -62,7 +67,8 @@ export default class UserController {
 					redirect: "/login",
 					template: "LoginFormView",
 					payload: {
-						user: user.props
+						user: user.props,
+						darkmode: dark
 					}
 				});
 			} catch (error) {
@@ -221,10 +227,6 @@ export default class UserController {
 
 		let userId = req.session.get("userId")
 		let favourites = await User.FavouritesReadAll(this.sql, userId)
-		let object = {}
-		favourites.forEach(element => {
-			
-		});
 
 		let darkmode = req.findCookie("darkmode")?.value
 		let dark = false
@@ -248,7 +250,7 @@ export default class UserController {
 			message: "Login retrieved",
 			payload: {
 				error: messages,
-				//darkmode: dark,
+				darkmode: dark,
 				pic: pic,
 				isLoggedIn: session.get("isLoggedIn"),
 				email: loggedInUser?.props.email,

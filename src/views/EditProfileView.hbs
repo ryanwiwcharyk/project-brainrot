@@ -44,16 +44,13 @@
             {{#if favourites}}
                 <ul>
                     {{#each favourites}}
-                        <li>
                             <form action="/redirect/{{props.username}}" method="GET" style="display:inline;">
                                 <input type="hidden" name="favouriteUsername" value="{{props.username}}">
                                 <input type="hidden" name="favouritePlatform" value="{{props.platformId}}">
-                                <button type="submit" style="background:none;border:none;color:blue;text-decoration:underline;cursor:pointer;">
+                                <button type="submit" style="width: 100%;">
                                     {{props.username}}
                                 </button>
-
-                            </form>
-                        </li>
+                            </form><br>
                     {{/each}}
                 </ul>
             {{else}}

@@ -38,12 +38,17 @@ export default class SearchController {
 
     getSearchForm = async (req: Request, res: Response) => {
         let messages = req.getSearchParams().get("error")
-
+        let darkmode = req.findCookie("darkmode")?.value
+		let dark = false
+		if (darkmode == "dark") {
+			dark = true
+		}
         if (req.getSearchParams().has("no_user")) {
             await res.send({
                 statusCode: StatusCode.Unauthorized,
                 message: "Search page retrieved with errors",
                 payload: {
+                    darkmode: dark,
                     error: "You must be logged in and have linked a platform profile to access stats this way.",
                     isLoggedIn: req.session.get("isLoggedIn")
                 },
@@ -55,6 +60,7 @@ export default class SearchController {
                 statusCode: StatusCode.OK,
                 message: "Search page retrieved",
                 payload: {
+                    darkmode: dark,
                     error: messages,
                     isLoggedIn: req.session.get("isLoggedIn")
                 },
@@ -145,7 +151,11 @@ export default class SearchController {
     }
     getStatisticsPage = async (req: Request, res: Response) => {
         let gameProfileId: number = req.session.get("gameProfileId")
-        
+        let darkmode = req.findCookie("darkmode")?.value
+		let dark = false
+		if (darkmode == "dark") {
+			dark = true
+		}
 
         try {
             let userStats: Stats | null = await Stats.read(this.sql, gameProfileId);
@@ -165,6 +175,7 @@ export default class SearchController {
                             statusCode: StatusCode.OK,
                             message: "Stats page retrieved",
                             payload: {
+                                darkmode: dark,
                                 name: userGameProfile.props.username,
                                 level: userStats.props.playerLevel,
                                 kills: userStats.props.playerKills,
@@ -182,6 +193,7 @@ export default class SearchController {
                             statusCode: StatusCode.OK,
                             message: "Stats page retrieved",
                             payload: {
+                                darkmode: dark,
                                 name: userGameProfile.props.username,
                                 level: userStats.props.playerLevel,
                                 kills: userStats.props.playerKills,
@@ -280,6 +292,11 @@ export default class SearchController {
     getLinkedProfileStats = async (req: Request, res: Response) => {
         let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"));
         //let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
+        let darkmode = req.findCookie("darkmode")?.value
+		let dark = false
+		if (darkmode == "dark") {
+			dark = true
+		}
 
         if (!gameProfile) {
             await res.send({
@@ -305,6 +322,7 @@ export default class SearchController {
                 statusCode: StatusCode.OK,
                 message: "Stats page retrieved",
                 payload: {
+                    darkmode: dark,
                     name: gameProfile.props.username,
                     level: profileStats.props.playerLevel,
                     kills: profileStats.props.playerKills,

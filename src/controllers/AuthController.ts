@@ -10,22 +10,27 @@ import SessionManager from "../auth/SessionManager";
 import Cookie from "../auth/Cookie";
 
 
-export default class AuthController{
-    private sql: postgres.Sql<any>;
+export default class AuthController {
+	private sql: postgres.Sql<any>;
 
-    constructor (sql: postgres.Sql<any>) {
-        this.sql = sql
-    }
+	constructor(sql: postgres.Sql<any>) {
+		this.sql = sql
+	}
 
-    registerRoutes(router: Router) {
-        router.get("/register", this.getRegistrationForm);
-        router.get("/login", this.getLoginForm);
-        router.get("/logout", this.logout);
-        router.post("/login", this.login);
-    }
+	registerRoutes(router: Router) {
+		router.get("/register", this.getRegistrationForm);
+		router.get("/login", this.getLoginForm);
+		router.get("/logout", this.logout);
+		router.post("/login", this.login);
+	}
 
-    getRegistrationForm = async (req: Request, res: Response) => {
-        let urlSearchParams: URLSearchParams = req.getSearchParams();
+	getRegistrationForm = async (req: Request, res: Response) => {
+		let darkmode = req.findCookie("darkmode")?.value
+		let dark = false
+		if (darkmode == "dark") {
+			dark = true
+		}
+		let urlSearchParams: URLSearchParams = req.getSearchParams();
 		if (urlSearchParams.has("password_error")) {
 			await res.send(
 				{
@@ -33,30 +38,33 @@ export default class AuthController{
 					message: "loaded registration form with errors",
 					template: "RegistrationFormView",
 					payload: {
+						darkmode: dark,
 						error: `Passwords do not match`
 					}
 				}
 			)
 		}
-        else if (urlSearchParams.has("empty_password")) {
+		else if (urlSearchParams.has("empty_password")) {
 			await res.send(
 				{
 					statusCode: StatusCode.BadRequest,
 					message: "loaded registration form with errors",
 					template: "RegistrationFormView",
 					payload: {
+						darkmode: dark,
 						error: `One or more of the password fields are empty`
 					}
 				}
 			)
 		}
-		else if (urlSearchParams.has("empty_email")){
+		else if (urlSearchParams.has("empty_email")) {
 			await res.send(
 				{
 					statusCode: StatusCode.BadRequest,
 					message: "loaded registration form with errors",
 					template: "RegistrationFormView",
 					payload: {
+						darkmode: dark,
 						error: "Email is required"
 					}
 				}
@@ -68,6 +76,7 @@ export default class AuthController{
 					message: "loaded registration form with errors",
 					template: "RegistrationFormView",
 					payload: {
+						darkmode: dark,
 						error: "A user with this email already exists"
 					}
 				}
@@ -80,6 +89,7 @@ export default class AuthController{
 					message: "loaded registration form with errors",
 					template: "RegistrationFormView",
 					payload: {
+						darkmode: dark,
 						error: "A user with this username already exists"
 					}
 				}
@@ -91,14 +101,22 @@ export default class AuthController{
 					statusCode: StatusCode.OK,
 					message: "loaded registration form",
 					template: "RegistrationFormView",
+					payload: {
+						darkmode: dark,
+					}
 				}
 			)
 		}
-    }
+	}
 
-    getLoginForm = async (req: Request, res: Response) => {
-        let urlSearchParams: URLSearchParams = req.getSearchParams();
-        res.setCookie(req.session.cookie)
+	getLoginForm = async (req: Request, res: Response) => {
+		let urlSearchParams: URLSearchParams = req.getSearchParams();
+		res.setCookie(req.session.cookie)
+		let darkmode = req.findCookie("darkmode")?.value
+		let dark = false
+		if (darkmode == "dark") {
+			dark = true
+		}
 		if (urlSearchParams.has("login_error")) {
 			await res.send(
 				{
@@ -106,23 +124,25 @@ export default class AuthController{
 					message: "loaded login form",
 					template: "LoginFormView",
 					payload: {
+						darkmode: dark,
 						error: `The email or password is incorrect.`
 					}
 				}
 			)
 		}
-        else if (urlSearchParams.has("empty_password")) {
-            await res.send(
+		else if (urlSearchParams.has("empty_password")) {
+			await res.send(
 				{
 					statusCode: StatusCode.BadRequest,
 					message: "loaded login form",
 					template: "LoginFormView",
 					payload: {
+						darkmode: dark,
 						error: `Password is required.`
 					}
 				}
 			)
-        }
+		}
 		else if (urlSearchParams.has("empty_email")) {
 			await res.send(
 				{
@@ -130,6 +150,7 @@ export default class AuthController{
 					message: "loaded login form",
 					template: "LoginFormView",
 					payload: {
+						darkmode: dark,
 						error: `Email is required.`
 					}
 				}
@@ -142,26 +163,27 @@ export default class AuthController{
 					message: "loaded login form",
 					template: "LoginFormView",
 					payload: {
+						darkmode: dark,
 						emailCookie: req.findCookie("email")?.value
 					}
 				}
 			)
 		}
-    }
+	}
 
-    logout = async (req: Request, res: Response) => {
-        let session: Session = req.getSession();
+	logout = async (req: Request, res: Response) => {
+		let session: Session = req.getSession();
 		session.destroy();
 		await res.send({
 			statusCode: StatusCode.OK,
 			message: "User successfully logged out",
 			redirect: "/login"
 		})
-    }
+	}
 
-    login = async (req: Request, res: Response) => {
-        let email: string = req.body["email"];
-		let password: string  = req.body["password"]
+	login = async (req: Request, res: Response) => {
+		let email: string = req.body["email"];
+		let password: string = req.body["password"]
 		let cookie: Cookie;
 
 		if (!email) {
@@ -173,15 +195,15 @@ export default class AuthController{
 				}
 			)
 		}
-        else if (!password) {
-            await res.send(
+		else if (!password) {
+			await res.send(
 				{
 					statusCode: StatusCode.BadRequest,
 					message: "Invalid credentials.",
 					redirect: "/login?empty_password=empty_fields"
 				}
 			)
-        }
+		}
 		else {
 			try {
 				let loggedInUser: User = await User.login(this.sql, email, password)
@@ -217,7 +239,7 @@ export default class AuthController{
 				)
 			}
 		}
-    }
+	}
 
 
 }
