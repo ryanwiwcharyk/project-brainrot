@@ -32,4 +32,20 @@ export class Platform {
 
 		return new Platform(sql, convertToCase(snakeToCamel, row) as PlatformProps);
 	}
+	static async readFromId(sql: postgres.Sql<any>, id: number) {
+		const connection = await sql.reserve();
+
+		const [row] = await connection<PlatformProps[]>`
+		SELECT * FROM
+		platform WHERE id = ${id}
+	`;
+
+		await connection.release();
+
+		if (!row) {
+			return null;
+		}
+
+		return new Platform(sql, convertToCase(snakeToCamel, row) as PlatformProps);
+	}
 }
