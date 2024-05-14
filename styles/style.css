@@ -93,6 +93,8 @@ body {
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   text-align: center; 
+  display:  flex;
+  flex-direction: column;
 }
 
 /* Styling the form headings */
@@ -122,8 +124,11 @@ label {
   box-sizing: border-box;
 }
 
+.favourites-form{
+  margin: 3px;
+}
 /* Styling the submit button */
-.form-submit-button {
+.form-submit-button, .favourites-form {
   background-color: navy;
   color: #fff;
   border: none;
@@ -286,3 +291,5 @@ body {
   text-align: left;
 }
   
+
+

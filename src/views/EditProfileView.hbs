@@ -42,17 +42,15 @@
         <div class="auth-form" id="left-align">
             <p>Favourites:</p>
             {{#if favourites}}
-                <ul>
                     {{#each favourites}}
-                            <form action="/redirect/{{props.username}}" method="GET" style="display:inline;">
+                            <form action="/redirect/{{props.username}}" method="GET" >
                                 <input type="hidden" name="favouriteUsername" value="{{props.username}}">
                                 <input type="hidden" name="favouritePlatform" value="{{props.platformId}}">
-                                <button type="submit" style="width: 100%;">
+                                <button type="submit" class="favourites-form" style="width: 100%;">
                                     {{props.username}}
                                 </button>
-                            </form><br>
+                            </form>
                     {{/each}}
-                </ul>
             {{else}}
                 <p>No favorites found.</p>
             {{/if}}
