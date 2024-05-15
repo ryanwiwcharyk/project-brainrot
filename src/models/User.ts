@@ -76,7 +76,7 @@ export default class User {
 
 		const email = await connection<UserProps[]>`
 			SELECT email FROM users WHERE email = ${props.email}`;
-		
+
 		const userName = await connection<UserProps[]>`
 			SELECT user_name FROM users WHERE user_name = ${props.userName}`;
 
@@ -91,7 +91,7 @@ export default class User {
 			INSERT INTO users
 			${sql(convertToCase(camelToSnake, props))}
 			RETURNING *`;
-		
+
 			await connection.release();
 
 			return new User(sql, convertToCase(snakeToCamel, row) as UserProps)
@@ -102,6 +102,21 @@ export default class User {
 		updateProps: Partial<UserProps>,
 	) {
 		const connection = await this.sql.reserve();
+		if (updateProps.email) {
+			const email = await connection<UserProps[]>`
+				SELECT email FROM users WHERE email = ${updateProps.email}`;
+			if (email.count !== 0) {
+				throw new DuplicateEmailError();
+			}
+		}
+		if (updateProps.userName) {
+			const userName = await connection<UserProps[]>`
+				SELECT user_name FROM users WHERE user_name = ${updateProps.userName}`;
+			if (userName.count !== 0) {
+				throw new DuplicateUsernameError();
+			}
+		}
+
 
 		const [row] = await connection`
 		UPDATE users
@@ -115,7 +130,7 @@ export default class User {
 
 		await connection.release();
 
-		this.props = { ...this.props, ...convertToCase(snakeToCamel, row)}
+		this.props = { ...this.props, ...convertToCase(snakeToCamel, row) }
 	}
 
 	static async read(sql: postgres.Sql<any>, id: number) {
