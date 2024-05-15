@@ -12,7 +12,7 @@ h1{
   align-items: center;
 }
   #nav-header {
-    background-color: rgb(4, 10, 45);;
+    background-color: #1F2937;
     padding: 10px 20px; /* Adjust padding as needed */
     display: flex;
     align-items: center; /* Vertically center items */
