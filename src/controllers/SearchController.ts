@@ -178,6 +178,7 @@ getStatisticsPage = async (req: Request, res: Response) => {
                     message: "Error getting user profile.",
                     redirect: `/search?error=try_again`,
                 });
+                return
             }
             
         }
@@ -192,6 +193,7 @@ getStatisticsPage = async (req: Request, res: Response) => {
                     message: "Could not retrieve user stats.",
                     redirect: "/search?error=try_again"
                 });
+                return
             }
             else {
                 let gameProfileUsername = req.session.get("gameProfileUsername");
@@ -256,6 +258,7 @@ getStatisticsPage = async (req: Request, res: Response) => {
                         message: "Search page retrieved with errors",
                         redirect: "/search?error=try_again"
                     });
+                    return
                 }
 
             }
