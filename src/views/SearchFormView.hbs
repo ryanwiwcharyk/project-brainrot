@@ -1,22 +1,18 @@
 {{> Header }}
 
 <div class="search-page">
-	<h1>Search</h1>
-	<div class="search-form">
+	<div class="search-container">
 		{{#if error}}
 		<p id="error"> {{error}}</p>
 		{{/if}}
 		<form method="POST" action="/search" id="search-form">
-
-
-			<input type="text" name="username" placeholder="Search for a player..." class="nav-search-input">
-			<select name="platform">
+			<input type="text" name="username" placeholder="Search for a player..." class="search-bar">
+			<select name="platform" class="search-select">
 				<option value="PC">PC</option>
 				<option value="XBOX">XBOX</option>
 				<option value="PSN">PSN</option>
 			</select><br>
 
-			<input type="submit" value="Search" id="search-form-submit-button">
 		</form>
 	</div>
 
