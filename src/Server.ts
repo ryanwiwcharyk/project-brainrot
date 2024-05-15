@@ -64,10 +64,7 @@ export default class Server {
 			res.send({
 				statusCode: StatusCode.OK,
 				message: "Homepage!",
-				template: "HomeView",
-				payload: {
-					title: "Project Brainrot",
-				},
+				redirect: "/search"
 			});
 		});
 	}

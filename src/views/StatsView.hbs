@@ -1,8 +1,5 @@
 {{> Header }}
 
-
-
-
 <div class="container">
     <div class="stats-header">
         <h1> {{name}}'s stats</h1>
@@ -11,9 +8,11 @@
             <form method="POST" action="/favourites" id="favourite-form">
                 <input type="hidden" value="{{favouritesPlatform}}" name="favouritesPlatform">
                 {{#if isFavourite}}
-                    <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox" onchange="this.form.submit()" checked="{{isFavourite}}">
+                <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox"
+                    onchange="this.form.submit()" checked="{{isFavourite}}">
                 {{else}}
-                    <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox" onchange="this.form.submit()">
+                <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox"
+                    onchange="this.form.submit()">
                 {{/if}}
                 <label for="favourite-checkbox" class="favourite-star">&#9733;</label>
             </form>
@@ -42,11 +41,51 @@
             <span>{{rank}}</span>
         </div>
     {{#unless isLinked}}
-        <form method="POST" action="/profile" >
-            <input type="submit" value="Claim Profile" class="form-submit-button">
-        </form>
+    <form method="POST" action="/profile">
+        <input type="submit" value="Claim Profile" class="form-submit-button">
+    </form>
     {{/unless}}
     </div>
 </div>
+
+{{#if statsHistory}}
+<div id="stats-history-header">
+    <h2>{{name}}'s Most Recent Sessions</h2>
+</div>
+{{#each statsHistory}}
+<div class="container">
+
+    <div class="grid-container">
+        <div class="grid-item">
+            <span>Kills:</span>
+            <span>{{this.props.sessionKills}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Damage dealt:</span>
+            <span>{{this.props.damageDealt}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Legend:</span>
+            <span>{{this.props.legendPlayed}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Map:</span>
+            <span>{{this.props.mapPlayed}}</span>
+        </div>
+        <div class="grid-item">
+            <span>Beginning of Session:</span>
+            <span>{{formatDate this.props.startTime}}</span>
+        </div>
+        <div class="grid-item">
+            <span>End of Session:</span>
+            <span>{{formatDate this.props.endTime}}</span>
+        </div>
+
+    </div>
+</div>
+{{/each}}
+{{else}}
+<p>no session history</p>
+{{/if}}
 
 {{> Footer }}
