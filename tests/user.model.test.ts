@@ -33,75 +33,77 @@ describe("User CRUD operations", () => {
 
     const createGameProfile = async (props: Partial<ProfileProps> = {}) => {
         return await GameProfile.create(sql, {
-            username: props.username || "Horizon",
+            username: props.username || "Davydav1919",
             platformId: props.platformId || 1,
             siteUserId: props.siteUserId,
         });
     };
 
     test("User was created.", async () => {
-        const user = await createUser({ password: "Password123" });
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
 
-        expect(user.props.email).toBe("user@email.com");
-        expect(user.props.password).toBe("Password123");
+        expect(user.props.email).toBe("123@gmail.com");
+        expect(user.props.password).toBe("123");
+        expect(user.props.userName).toBe("Davydav");
         expect(user.props.createdAt).toBeTruthy();
         expect(user.props.editedAt).toBeFalsy();
     });
 
-    test("User was not created with duplicate email.", async () => {
-        await createUser({ email: "user@email.com" });
+    test("User was not created due to duplicate email.", async () => {
+        await createUser({ email: "123@gmail.com" });
 
         await expect(async () => {
-            await createUser({ email: "user@email.com" });
+            await createUser({ email: "123@gmail.com" });
         }).rejects.toThrow(DuplicateEmailError);
     });
 
-    test("User was not created with duplicate username.", async () => {
-        await createUser({ userName: "user123" });
+    test("User was not created due to duplicate username.", async () => {
+        await createUser({ userName: "Davydav" });
 
         await expect(async () => {
-            await createUser({ userName: "user123" });
+            await createUser({ userName: "Davydav" });
         }).rejects.toThrow(DuplicateUsernameError);
     });
 
     test("User was logged in.", async () => {
-        const user = await createUser({ password: "Password123" });
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
         const loggedInUser = await User.login(
             sql,
             user.props.email,
-            "Password123",
+            user.props.password,
         );
 
-        expect(loggedInUser?.props.email).toBe("user@email.com");
-        expect(loggedInUser?.props.password).toBe("Password123");
+        expect(loggedInUser?.props.email).toBe("123@gmail.com");
+        expect(loggedInUser?.props.password).toBe("123");
     });
 
-    test("User was not logged in with invalid password.", async () => {
-        const user = await createUser({ password: "Password123" });
+    test("User was not logged in due to invalid password.", async () => {
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
 
         await expect(async () => {
             await User.login(sql, user.props.email, "wrongpassword");
         }).rejects.toThrow(InvalidCredentialsError);
     });
 
-    test("User was not logged in with invalid email.", async () => {
-        const user = await createUser({ password: "Password123" });
+    test("User was not logged in due to invalid email.", async () => {
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
 
         await expect(async () => {
-            await User.login(sql, "invalid@email.com", "password");
+            await User.login(sql, "invalid@email.com", user.props.password);
         }).rejects.toThrow(InvalidCredentialsError);
     });
 
     test("User was read.", async () => {
-        const user = await createUser({ password: "Password123" });
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
         const readUser = await User.read(sql, user.props.id!);
 
-        expect(readUser?.props.email).toBe("user@email.com");
-        expect(readUser?.props.password).toBe("Password123");
+        expect(readUser?.props.email).toBe("123@gmail.com");
+        expect(readUser?.props.password).toBe("123");
+        expect(user.props.userName).toBe("Davydav");
     });
 
     test("User was updated.", async () => {
-        const user = await createUser({ password: "Password123" });
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
         const oldPassword = user.props.password;
 
         await user.update({
@@ -115,19 +117,19 @@ describe("User CRUD operations", () => {
         expect(user.props.editedAt).toBeTruthy();
     });
 
-    test("User was not updated with duplicate email.", async () => {
-        const user1 = await createUser({ email: "user1@email.com" });
-        const user2 = await createUser({ email: "user2@email.com" });
+    test("User was not updated due to duplicate email.", async () => {
+        const user1 = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
+        const user2 = await createUser({ userName: "Horizon", email: "1234@gmail.com", password: "123" });
 
         await expect(async () => {
-            await user2.update({ email: "user1@email.com" });
+            await user2.update({ email: "123@gmail.com" });
         }).rejects.toThrow(DuplicateEmailError);
 
         expect(user2.props.email).not.toBe(user1.props.email);
     });
 
     test("User was deleted.", async () => {
-        const user = await createUser({ password: "Password123" });
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
         await user.delete(sql, user.props.id!);
 
         const deletedUser = await User.read(sql, user.props.id!);
@@ -136,8 +138,8 @@ describe("User CRUD operations", () => {
     });
 
     test("User added a game profile to favourites.", async () => {
-        const user = await createUser();
-        const profile = await createGameProfile();
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
+        const profile = await createGameProfile({username: "Davydav1919", platformId: 1});
 
         await User.FavouritesCreate(sql, user.props.id!, profile.props.id!);
 
@@ -148,8 +150,8 @@ describe("User CRUD operations", () => {
     });
 
     test("User removed a game profile from favourites.", async () => {
-        const user = await createUser();
-        const profile = await createGameProfile();
+        const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
+        const profile = await createGameProfile({username: "Davydav1919", platformId: 1});
 
         await User.FavouritesCreate(sql, user.props.id!, profile.props.id!);
         await User.FavouritesDelete(sql, user.props.id!, profile.props.id!);
