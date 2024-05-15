@@ -77,7 +77,7 @@
   
   .grid-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    flex-direction: column;
     grid-gap: 10px;
   }
   
