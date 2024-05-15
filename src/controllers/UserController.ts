@@ -53,6 +53,13 @@ export default class UserController {
 				redirect: "/register?empty_password=password_empty"
 			})
 		}
+		else if (!userProps.userName) {
+			await res.send({
+				statusCode: StatusCode.BadRequest,
+				message: "Missing username.",
+				redirect: "/register?empty_username=username_empty"
+			})
+		}
 		else if (req.body["password"] === req.body["confirmPassword"]) {
 			try {
 				user = await User.create(this.sql, userProps);

@@ -23,17 +23,15 @@ test.beforeEach(async () => {
  */
 test.afterEach(async ({ page }) => {
 	// Replace the table_name with the name of the table(s) you want to clean up.
-	const tables = ["users"];
-
 	try {
-		for (const table of tables) {
-			await sql.unsafe(`DELETE FROM ${table}`);
-			await sql.unsafe(`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`);
-		}
+
+		await sql.unsafe(
+			`TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats;`,
+		);
+
 	} catch (error) {
 		console.error(error);
 	}
-
 	await logout(page);
 });
 
@@ -61,6 +59,7 @@ test("User was registered.", async ({ page }) => {
 		'form#register-form input[name="confirmPassword"]',
 		"Password123",
 	);
+	await page.fill('form#register-form input[name="userName"]', "ryan")
 	await page.click("form#register-form #register-form-submit-button");
 
 	expect(await page?.url()).toBe(getPath("login"));
@@ -74,6 +73,7 @@ test("User was not registered with blank email.", async ({ page }) => {
 		'form#register-form input[name="confirmPassword"]',
 		"Password123",
 	);
+	await page.fill('form#register-form input[name="userName"]', "ryan")
 	await page.click("form#register-form #register-form-submit-button");
 
 	expect(await page?.url()).toMatch(getPath("register"));
@@ -92,6 +92,7 @@ test("User was not registered with mismatched passwords.", async ({ page }) => {
 		'form#register-form input[name="confirmPassword"]',
 		"Password124",
 	);
+	await page.fill('form#register-form input[name="userName"]', "ryan")
 	await page.click("form#register-form #register-form-submit-button");
 
 	expect(await page?.url()).toMatch(getPath("register"));
@@ -101,30 +102,46 @@ test("User was not registered with mismatched passwords.", async ({ page }) => {
 	expect(await errorElement?.innerText()).toMatch("Passwords do not match");
 });
 
+test("User was not registered with no username.", async ({ page }) => {
+	await page.goto(`register`);
+
+	await page.fill('form#register-form input[name="email"]', "user@email.com");
+	await page.fill('form#register-form input[name="password"]', "Password123");
+	await page.fill(
+		'form#register-form input[name="confirmPassword"]',
+		"Password124",
+	);
+	await page.click("form#register-form #register-form-submit-button");
+
+	expect(await page?.url()).toMatch(getPath("register"));
+
+	const errorElement = await page.$("#error");
+
+	expect(await errorElement?.innerText()).toMatch("Username is required.");
+});
+
 test("User was logged in.", async ({ page }) => {
-	const user = await createUser({ password: "Password123" });
+    const user = await createUser({ email: "test@example.com", password: "Password123" });
 
-	await page.goto(`/`);
+    await page.goto(`/login`);
 
-	let loginElement = await page.$(`nav a[href="${getPath("login")}"]`);
-	let logoutElement = await page.$(`nav a[href="${getPath("logout")}"]`);
+    // Fill in the email and password fields
+    await page.fill('form.auth-form input[name="email"]', user.props.email);
+    await page.fill('form.auth-form input[name="password"]', "Password123");
 
-	expect(await loginElement).toBeTruthy();
-	expect(await logoutElement).toBeFalsy();
+    // Click the login button
+    await page.click("form.auth-form .form-submit-button");
 
-	await loginElement?.click();
+    // Check if the page redirects to the search page after login
+    expect(await page?.url()).toBe(getPath("search"));
 
-	await page.fill('form#login-form input[name="email"]', user.props.email);
-	await page.fill('form#login-form input[name="password"]', "Password123");
-	await page.click("form#login-form #login-form-submit-button");
+    // Check if the error message element is not present (indicating successful login)
+    const errorMessage = await page.$("#error");
+    expect(errorMessage).toBeFalsy();
 
-	expect(await page?.url()).toBe(getPath("todos"));
-
-	loginElement = await page.$(`nav a[href="${getPath("login")}"]`);
-	logoutElement = await page.$(`nav a[href="${getPath("logout")}"]`);
-
-	expect(await loginElement).toBeFalsy();
-	expect(await logoutElement).toBeTruthy();
+    // Check if the logout button is present
+    const logoutButton = await page.$('input.nav-button[type="submit"][value="Logout"]');
+    expect(logoutButton).toBeTruthy();
 });
 
 test("User was not logged in with blank email.", async ({ page }) => {
@@ -142,6 +159,21 @@ test("User was not logged in with blank email.", async ({ page }) => {
 	expect(await errorElement?.innerText()).toMatch("Email is required.");
 });
 
+test("User was not logged in with blank password.", async ({ page }) => {
+	const user = await createUser({ email: "user@email.com" });
+
+	await page.goto(`/login`);
+
+	await page.fill('form#login-form input[name="email"]', "user@email.com");
+	await page.click("form#login-form #login-form-submit-button");
+
+	expect(await page?.url()).toMatch(getPath("login"));
+
+	const errorElement = await page.$("#error");
+
+	expect(await errorElement?.innerText()).toMatch("Password is required.");
+});
+
 test("User was not logged in with incorrect password.", async ({ page }) => {
 	const user = await createUser({ password: "Password123" });
 
@@ -155,7 +187,7 @@ test("User was not logged in with incorrect password.", async ({ page }) => {
 
 	const errorElement = await page.$("#error");
 
-	expect(await errorElement?.innerText()).toMatch("Invalid credentials.");
+	expect(await errorElement?.innerText()).toMatch("The email or password is incorrect.");
 });
 
 test("User was logged out.", async ({ page, context }) => {
@@ -171,15 +203,15 @@ test("User was logged out.", async ({ page, context }) => {
 	await page.fill('form#login-form input[name="password"]', "Password123");
 	await page.click("form#login-form #login-form-submit-button");
 
-	expect(await page?.url()).toBe(getPath("todos"));
+	expect(await page?.url()).toBe(getPath("search"));
 
-	const logoutElement = await page.$(`nav a[href="${getPath("logout")}"]`);
+	const logoutButton = await page.$('input.nav-button[type="submit"][value="Logout"]');
 
-	await logoutElement?.click();
+	await logoutButton?.click();
 
-	expect(await page?.url()).toBe(getPath(""));
+	expect(await page?.url()).toBe(getPath("login"));
 
-	const loginElement = await page.$(`nav a[href="${getPath("login")}"]`);
+	const loginElement = await page.$('input.nav-button[type="submit"][value="Login"]');
 
 	expect(await loginElement).toBeTruthy();
 });

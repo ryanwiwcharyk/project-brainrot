@@ -96,6 +96,19 @@ export default class AuthController {
 				}
 			)
 		}
+		else if (urlSearchParams.has("empty_username")) {
+			await res.send(
+				{
+					statusCode: StatusCode.BadRequest,
+					message: "loaded registration form with errors",
+					template: "RegistrationFormView",
+					payload: {
+						darkmode: dark,
+						error: "Username is required."
+					}
+				}
+			)
+		}
 		else {
 			await res.send(
 				{
