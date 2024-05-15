@@ -10,6 +10,7 @@ import SessionManager from "../auth/SessionManager";
 import Cookie from "../auth/Cookie";
 import { createUTCDate } from "../utils";
 import Profile from "../models/GameProfile";
+import { url } from "inspector";
 
 
 export default class UserController {
@@ -219,7 +220,7 @@ export default class UserController {
 		let messages = req.getSearchParams().get("error")
 		let loggedInUser: User | null = await User.read(this.sql, req.session.get("userId"))
 		let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
-
+		let urlSearchParams: URLSearchParams = req.getSearchParams()
 		let userId = req.session.get("userId")
 		let favourites = await User.FavouritesReadAll(this.sql, userId)
 
@@ -239,22 +240,40 @@ export default class UserController {
 			});
 			return
 		}
-
-		await res.send({
-			statusCode: StatusCode.OK,
-			message: "Login retrieved",
-			payload: {
-				error: messages,
-				darkmode: dark,
-				pic: pic,
-				isLoggedIn: session.get("isLoggedIn"),
-				email: loggedInUser?.props.email,
-				username: loggedInUser?.props.userName,
-				favourites: favourites,
-				gameProfile: gameProfile
-			},
-			template: "EditProfileView"
-		});
+		if (urlSearchParams.has("success")) {
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "Edit form retrieved",
+				payload: {
+					success: "User updated successfully",
+					darkmode: dark,
+					pic: pic,
+					isLoggedIn: session.get("isLoggedIn"),
+					email: loggedInUser?.props.email,
+					username: loggedInUser?.props.userName,
+					favourites: favourites,
+					gameProfile: gameProfile
+				},
+				template: "EditProfileView"
+			});
+		}
+		else {
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "Edit form retrieved",
+				payload: {
+					darkmode: dark,
+					pic: pic,
+					isLoggedIn: session.get("isLoggedIn"),
+					email: loggedInUser?.props.email,
+					username: loggedInUser?.props.userName,
+					favourites: favourites,
+					gameProfile: gameProfile
+				},
+				template: "EditProfileView"
+			});
+		}
+		
 	}
 	updateUser = async (req: Request, res: Response) => {
 		let session = req.getSession();
@@ -285,7 +304,7 @@ export default class UserController {
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
-				redirect: "/users/edit"
+				redirect: "/users/edit?success=updated_successfully"
 			});
 		}
 		if (!req.body.password && !req.body.pic && !req.body.email && !req.body.darkmode) {
@@ -293,7 +312,7 @@ export default class UserController {
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
-				redirect: "/users/edit"
+				redirect: "/users/edit?success=updated_successfully"
 			});
 		}
 		try {
@@ -324,7 +343,7 @@ export default class UserController {
 				await res.send({
 					statusCode: StatusCode.OK,
 					message: "User updated successfully!",
-					redirect: "/users/edit"
+					redirect: "/users/edit?success=updated_successfully"
 				});
 			}
 		}
