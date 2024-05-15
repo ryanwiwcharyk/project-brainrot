@@ -14,13 +14,15 @@ describe("Platform operations", () => {
      * from the platform table and resets the sequence for the table.
      */
     afterEach(async () => {
-        const table = "platform";
+        const tables = ["users", "favourites", "game_profile", "platform", "stats", "session_stats"];
 
         try {
-            await sql.unsafe(`DELETE FROM ${table}`);
-            await sql.unsafe(
-                `ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
-            );
+            for (const table of tables) {
+                await sql.unsafe(`DELETE FROM ${table}`);
+                await sql.unsafe(
+                    `ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
+                );
+            }
         } catch (error) {
             console.error(error);
         }

@@ -3,7 +3,7 @@ import { test, expect, Page } from "@playwright/test";
 import { getPath } from "../src/url";
 
 const sql = postgres({
-	database: "MyDB",
+	database: "UserStats",
 });
 
 const logout = async (page: Page) => {

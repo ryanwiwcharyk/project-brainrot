@@ -9,18 +9,16 @@ describe("Stats operations", () => {
         database: "UserStats",
     });
 
-    /**
-     * Clean up the database after each test. This function deletes all the rows
-     * from the stats table and resets the sequence for the table.
-     */
     afterEach(async () => {
-        const table = "stats";
+        const tables = ["users", "favourites", "game_profile", "platform", "stats", "session_stats"];
 
         try {
-            await sql.unsafe(`DELETE FROM ${table}`);
-            await sql.unsafe(
-                `ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
-            );
+            for (const table of tables) {
+                await sql.unsafe(`DELETE FROM ${table}`);
+                await sql.unsafe(
+                    `ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
+                );
+            }
         } catch (error) {
             console.error(error);
         }
@@ -94,7 +92,7 @@ describe("Stats operations", () => {
 
     test("Stats are updated correctly", async () => {
         const stats = await createStats({
-            playerLevel: "10",
+            playerLevel: 10,
             playerKills: 50,
             playerDeaths: 20,
             killDeathRatio: 2.5,
@@ -105,7 +103,7 @@ describe("Stats operations", () => {
         });
 
         const updatedProps: Partial<StatsProps> = {
-            playerLevel: "15",
+            playerLevel: 15,
             playerKills: 75,
             playerDeaths: 25,
             killDeathRatio: 3,
@@ -116,7 +114,7 @@ describe("Stats operations", () => {
 
         const updatedStats = await stats.update(sql, updatedProps, stats.props.id!);
 
-        expect(updatedStats.props.playerLevel).toBe("15");
+        expect(updatedStats.props.playerLevel).toBe(15);
         expect(updatedStats.props.playerKills).toBe(75);
         expect(updatedStats.props.playerDeaths).toBe(25);
         expect(updatedStats.props.killDeathRatio).toBe(3);

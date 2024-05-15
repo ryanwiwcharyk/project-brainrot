@@ -11,7 +11,7 @@ describe("User CRUD operations", () => {
 
 
     afterEach(async () => {
-        const tables = ["users", "favourites", "game_profile", "platform"];
+        const tables = ["users", "favourites", "game_profile", "platform", "stats", "session_stats"];
 
         try {
             for (const table of tables) {

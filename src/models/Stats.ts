@@ -9,7 +9,7 @@ import { SourceMap } from "module";
 
 export interface StatsProps {
 	id?: number;
-	playerLevel?: string;
+	playerLevel?: number;
 	playerKills?: number;
 	playerDeaths?: number;
 	killDeathRatio?: number;

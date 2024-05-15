@@ -11,7 +11,7 @@ import {
 describe("CRUD operations", () => {
 	// Set up the connection to the DB.
 	const sql = postgres({
-		database: "MyDB",
+		database: "UserStats",
 	});
 
 	beforeEach(async () => {
@@ -25,18 +25,18 @@ describe("CRUD operations", () => {
 	 */
 	afterEach(async () => {
 		// Replace the table_name with the name of the table(s) you want to clean up.
-		const tables = ["table_name"];
+		const tables = ["users", "favourites", "game_profile", "platform", "stats", "session_stats"];
 
-		try {
-			for (const table of tables) {
-				await sql.unsafe(`DELETE FROM ${table}`);
-				await sql.unsafe(
-					`ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
-				);
-			}
-		} catch (error) {
-			console.error(error);
-		}
+        try {
+            for (const table of tables) {
+                await sql.unsafe(`DELETE FROM ${table}`);
+                await sql.unsafe(
+                    `ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
+                );
+            }
+        } catch (error) {
+            console.error(error);
+        }
 	});
 
 	// Close the connection to the DB after all tests are done.

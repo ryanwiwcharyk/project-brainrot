@@ -11,7 +11,7 @@ import {
 
 describe("HTTP operations", () => {
 	const sql = postgres({
-		database: "MyDB",
+		database: "UserStats",
 	});
 
 	beforeEach(async () => {
