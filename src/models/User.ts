@@ -167,7 +167,7 @@ export default class User {
 	static async FavouritesReadAll(
 		sql: postgres.Sql<any>,
 		userId: number
-	): Promise<GameProfile[]> {
+	): Promise<GameProfile[] | null> {
 		const connection = await sql.reserve();
 
 		const rows: postgres.RowList<ProfileProps[]> = await connection<ProfileProps[]>`
@@ -178,6 +178,10 @@ export default class User {
 		`;
 
 		await connection.release();
+
+		if (!rows) {
+			return null;
+		}
 
 		return rows.map(
 			(row: ProfileProps) =>

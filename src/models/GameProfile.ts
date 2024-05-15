@@ -28,8 +28,8 @@ export default class Profile {
 
 
 		const [row] = await connection<ProfileProps[]>`
-			INSERT INTO game_profile
-			${sql(convertToCase(camelToSnake, props))}
+			INSERT INTO game_profile (username, platform_id)
+			VALUES (${props.username}, ${props.platformId})
 			RETURNING *
 			`;
 

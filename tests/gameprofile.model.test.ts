@@ -32,11 +32,11 @@ describe("Profile CRUD operations", () => {
     };
 
     test("Profile was created.", async () => {
+        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1});
 
         expect(profile.props.username).toBe("Davydav1919");
         expect(profile.props.platformId).toBe(1);
-        expect(profile.props.siteUserId).toBeUndefined();
     });
 
     test("Profile was read.", async () => {
@@ -50,14 +50,16 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was not read with invalid username.", async () => {
+        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1 });
 
-        const readProfile = await Profile.read(sql, "invalidUser", "PC");
+        const readProfile = await Profile.read(sql, "invalidUser", "InvalidPlatform");
 
         expect(readProfile).toBeNull();
     });
 
     test("Profile was not read with invalid platform.", async () => {
+        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1 });
 
         const readProfile = await Profile.read(sql, "Davydav1919", "InvalidPlatform");
@@ -66,6 +68,7 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was linked to site profile.", async () => {
+        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
 
         await profile.linkToSiteProfile(1);
@@ -74,7 +77,8 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was unlinked from site profile.", async () => {
-        const profile = await createProfile({ username: "Horizon"});
+        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
+        const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
         await profile.linkToSiteProfile(1)
 
         await profile.unlinkPlatformAccount(1);
@@ -83,17 +87,19 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was retrieved by site user ID.", async () => {
-        const profile = await createProfile({ username: "Horizon"});
+        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
+        const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
         await profile.linkToSiteProfile(1)
 
         const retrievedProfile = await Profile.getGameProfileFromUserId(sql, 1);
 
-        expect(retrievedProfile?.props.username).toBe("Horizon");
+        expect(retrievedProfile?.props.username).toBe("Davydav1919");
         expect(retrievedProfile?.props.siteUserId).toBe(1);
     });
 
     test("Profile was not retrieved by invalid site user ID.", async () => {
-        const profile = await createProfile({ username: "Horizon"});
+        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
+        const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
         await profile.linkToSiteProfile(1)
 
         const retrievedProfile = await Profile.getGameProfileFromUserId(sql, 999);

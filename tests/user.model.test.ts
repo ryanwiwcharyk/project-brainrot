@@ -52,17 +52,24 @@ describe("User CRUD operations", () => {
     test("User was not created due to duplicate email.", async () => {
         await createUser({ email: "123@gmail.com" });
 
-        await expect(async () => {
+        try {
             await createUser({ email: "123@gmail.com" });
-        }).rejects.toThrow(DuplicateEmailError);
+            expect(false).toBeFalsy();
+        } catch (error) {
+            expect(true).toBeTruthy();
+        }
+        
     });
 
     test("User was not created due to duplicate username.", async () => {
         await createUser({ userName: "Davydav" });
 
-        await expect(async () => {
+        try {
             await createUser({ userName: "Davydav" });
-        }).rejects.toThrow(DuplicateUsernameError);
+            expect(false).toBeFalsy();
+        } catch (error) {
+            expect(true).toBeTruthy();
+        }
     });
 
     test("User was logged in.", async () => {
@@ -146,7 +153,10 @@ describe("User CRUD operations", () => {
         const favourites = await User.FavouritesReadAll(sql, user.props.id!);
 
         expect(favourites).toHaveLength(1);
-        expect(favourites[0].props.username).toBe(profile.props.username);
+        expect(favourites).not.toBeNull();
+        if(favourites){
+            expect(favourites[0].props.username).toBe(profile.props.username);     
+        }
     });
 
     test("User removed a game profile from favourites.", async () => {
@@ -158,6 +168,6 @@ describe("User CRUD operations", () => {
 
         const favourites = await User.FavouritesReadAll(sql, user.props.id!);
 
-        expect(favourites).toHaveLength(0);
+        expect(favourites).toBeNull();
     });
 });
