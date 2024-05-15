@@ -390,6 +390,12 @@ body {
   gap: 20px;
 }
 
+.map-data-image {
+  width: 100%; /* Make the image take the full width of its container */
+  height: 100%; /* Let the height adjust automatically to maintain aspect ratio */
+  object-fit: cover; /* Ensure the image covers the entire container while maintaining aspect ratio */
+}
+
 .map-data .current-map-data,
 .map-data .next-map-data {
   text-align: center;

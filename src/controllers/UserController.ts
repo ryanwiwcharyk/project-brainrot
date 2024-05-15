@@ -106,7 +106,7 @@ export default class UserController {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
 				message: "Must be logged in to claim a profile.",
-				redirect: `/login`,
+				redirect: `/login?no_user_link=not_logged_in`,
 			});
 			return;
 		}
@@ -148,7 +148,7 @@ export default class UserController {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
 				message: "Must be logged in to favourite a profile.",
-				redirect: `/login`,
+				redirect: `/login?no_user=not_logged_in`,
 			});
 			return;
 		}
@@ -191,9 +191,9 @@ export default class UserController {
 
 		if (!gameProfile) {
 			await res.send({
-				statusCode: StatusCode.NotFound,
-				message: "Error finding profile in database",
-				redirect: `/stats/${req.session.get("gameProfileUsername")}?error=profile_not_found`,
+				statusCode: StatusCode.Unauthorized,
+				message: "Must be logged in to unlink an account",
+				redirect: `login?no_user_unlink=not_logged_in`,
 			});
 			return;
 		}
@@ -210,7 +210,7 @@ export default class UserController {
 
 		await res.send({
 			statusCode: StatusCode.OK,
-			message: "Profiles linked successfully",
+			message: "Profiles unlinked successfully",
 			redirect: `/users/edit`,
 		});
 	}
@@ -235,7 +235,7 @@ export default class UserController {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
 				message: "Unauthorized",
-				redirect: `/login`,
+				redirect: `/login?no_user_edit=not_logged_in`,
 			});
 			return
 		}
@@ -262,7 +262,7 @@ export default class UserController {
 			await res.send({
 				statusCode: StatusCode.Unauthorized,
 				message: "Unauthorized",
-				redirect: `/login`,
+				redirect: `/login?no_user_edit`,
 			});
 			return
 		}
