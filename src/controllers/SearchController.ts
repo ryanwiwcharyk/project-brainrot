@@ -5,7 +5,7 @@ import Router from "../router/Router";
 import { createUTCDate } from "../utils";
 import Stats, { StatsProps } from "../models/Stats";
 import Profile, { ProfileProps } from "../models/GameProfile";
-import { Platform, PlatformProps } from "../models/Platform";
+import Platform, { PlatformProps } from "../models/Platform";
 import StatsHistory, { StatsHistoryProps } from "../models/StatsHistory";
 import User from "../models/User";
 import { ResolvedResult } from "vite/runtime";

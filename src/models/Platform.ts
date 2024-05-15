@@ -11,7 +11,7 @@ export interface PlatformProps {
 	platformName: string;
 }
 
-export class Platform {
+export default class Platform {
 	constructor(
 		private sql: postgres.Sql<any>,
 		public props: PlatformProps,
