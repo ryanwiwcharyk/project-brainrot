@@ -17,7 +17,7 @@ describe("StatsHistory operations", () => {
         try {
 
             await sql.unsafe(
-                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats;`,
+                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats restart identity;`,
             );
 
         } catch (error) {

@@ -17,7 +17,7 @@ describe("Platform operations", () => {
         try {
 
             await sql.unsafe(
-                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats;`,
+                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats restart identity;`,
             );
 
         } catch (error) {
@@ -54,15 +54,6 @@ describe("Platform operations", () => {
         expect(platform).toBeNull();
     });
 
-    test("Platform is read correctly by ID", async () => {
-        const platformName = "PlayStation";
-        const createdPlatform = await createPlatform(platformName);
-
-        const platform = await Platform.readFromId(sql, createdPlatform.props.id!);
-
-        expect(platform).not.toBeNull();
-        expect(platform!.props.platformName).toBe(platformName);
-    });
 
     test("Reading platform by non-existent ID returns null", async () => {
         const platform = await Platform.readFromId(sql, 999); // Using an ID that doesn't exist

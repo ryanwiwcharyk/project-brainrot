@@ -16,7 +16,7 @@ describe("Profile CRUD operations", () => {
         try {
 
             await sql.unsafe(
-                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats;`,
+                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats restart identity;`,
             );
 
         } catch (error) {
@@ -37,6 +37,7 @@ describe("Profile CRUD operations", () => {
 
         expect(profile.props.username).toBe("Davydav1919");
         expect(profile.props.platformId).toBe(1);
+        expect(true).toBeTruthy();
     });
 
     test("Profile was read.", async () => {
@@ -47,6 +48,7 @@ describe("Profile CRUD operations", () => {
 
         expect(readProfile?.props.username).toBe("Davydav1919");
         expect(readProfile?.props.platformId).toBe(1);
+        expect(true).toBeTruthy();
     });
 
     test("Profile was not read with invalid username.", async () => {
@@ -56,6 +58,7 @@ describe("Profile CRUD operations", () => {
         const readProfile = await Profile.read(sql, "invalidUser", "InvalidPlatform");
 
         expect(readProfile).toBeNull();
+        expect(true).toBeTruthy();
     });
 
     test("Profile was not read with invalid platform.", async () => {
@@ -65,6 +68,7 @@ describe("Profile CRUD operations", () => {
         const readProfile = await Profile.read(sql, "Davydav1919", "InvalidPlatform");
 
         expect(readProfile).toBeNull();
+        expect(true).toBeTruthy();
     });
 
     test("Profile was linked to site profile.", async () => {
