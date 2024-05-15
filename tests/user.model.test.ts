@@ -2,6 +2,7 @@ import postgres from "postgres";
 import { test, describe, expect, afterEach } from "vitest";
 import User, { UserProps, DuplicateEmailError, InvalidCredentialsError, DuplicateUsernameError } from "../src/models/User";
 import GameProfile, { ProfileProps } from "../src/models/GameProfile";
+import { createUTCDate } from "../src/utils";
 
 describe("User CRUD operations", () => {
     const sql = postgres({

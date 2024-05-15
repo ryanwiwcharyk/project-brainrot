@@ -10,54 +10,13 @@ import { SourceMap } from "module";
 export interface StatsProps {
 	id?: number;
 	playerLevel?: string;
-	playerKills?: boolean;
+	playerKills?: number;
 	playerDeaths?: number;
 	killDeathRatio?: number;
 	playerDamage?: number;
 	playerWins?: number;
 	playerRank?: string;
 	profileId?: number;
-}
-
-export interface StatsHistoryProps {
-	id?: number,
-	legendPlayed?: string,
-	mapPlayed?: string,
-	damageDealt?: number,
-	startTime?: bigint,
-	endTime?: bigint,
-	sessionKills?: number,
-	profileId?: number
-
-}
-
-export class StatsHistory {
-	constructor(
-		private sql: postgres.Sql<any>,
-		public props: StatsHistoryProps,
-	) { }
-
-	static async readStatsHistory(
-		sql: postgres.Sql<any>,
-		profileId: number): Promise<StatsHistory[] | null> {
-		const connection = await sql.reserve();
-
-		const rows: postgres.RowList<StatsHistoryProps[]> = await connection<StatsHistoryProps[]>`
-			SELECT * FROM
-			session_stats WHERE profile_id = ${profileId}
-		`;
-
-		await connection.release();
-
-		if (!rows) {
-			return null;
-		}
-
-		return rows.map(
-			(row: StatsHistoryProps) =>
-				new StatsHistory(sql, convertToCase(snakeToCamel, row) as StatsHistoryProps)
-		);
-	}
 }
 
 export default class Stats {

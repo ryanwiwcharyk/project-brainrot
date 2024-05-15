@@ -1,11 +1,11 @@
 import postgres from "postgres";
 import { test, describe, expect, afterEach } from "vitest";
-import Profile, { ProfileProps } from "../src/models/Profile";
+import Profile, { ProfileProps } from "../src/models/GameProfile";
 
 describe("Profile CRUD operations", () => {
     // Set up the connection to the DB.
     const sql = postgres({
-        database: "TodoDB",
+        database: "UserStats",
     });
 
     /**
