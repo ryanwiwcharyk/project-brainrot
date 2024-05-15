@@ -10,15 +10,12 @@ describe("Stats operations", () => {
     });
 
     afterEach(async () => {
-        const tables = ["users", "favourites", "game_profile", "platform", "stats", "session_stats"];
-
         try {
-            for (const table of tables) {
-                await sql.unsafe(`DELETE FROM ${table}`);
-                await sql.unsafe(
-                    `ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
-                );
-            }
+
+            await sql.unsafe(
+                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats;`,
+            );
+
         } catch (error) {
             console.error(error);
         }
@@ -39,7 +36,7 @@ describe("Stats operations", () => {
 
     test("Stats are created and read correctly", async () => {
         const stats1 = await createStats({
-            playerLevel: "10",
+            playerLevel: 10,
             playerKills: 50,
             playerDeaths: 20,
             killDeathRatio: 2.5,
@@ -50,7 +47,7 @@ describe("Stats operations", () => {
         });
 
         const stats2 = await createStats({
-            playerLevel: "20",
+            playerLevel: 20,
             playerKills: 100,
             playerDeaths: 50,
             killDeathRatio: 2,
@@ -64,7 +61,7 @@ describe("Stats operations", () => {
         const readStats2 = await Stats.read(sql, 2);
 
         expect(readStats1).not.toBeNull();
-        expect(readStats1!.props.playerLevel).toBe("10");
+        expect(readStats1!.props.playerLevel).toBe(10);
         expect(readStats1!.props.playerKills).toBe(50);
         expect(readStats1!.props.playerDeaths).toBe(20);
         expect(readStats1!.props.killDeathRatio).toBe(2.5);
@@ -74,7 +71,7 @@ describe("Stats operations", () => {
         expect(readStats1!.props.profileId).toBe(1);
 
         expect(readStats2).not.toBeNull();
-        expect(readStats2!.props.playerLevel).toBe("20");
+        expect(readStats2!.props.playerLevel).toBe(20);
         expect(readStats2!.props.playerKills).toBe(100);
         expect(readStats2!.props.playerDeaths).toBe(50);
         expect(readStats2!.props.killDeathRatio).toBe(2);
@@ -106,7 +103,7 @@ describe("Stats operations", () => {
             playerLevel: 15,
             playerKills: 75,
             playerDeaths: 25,
-            killDeathRatio: 3,
+            killDeathRatio: 3.0,
             playerDamage: 7500,
             playerWins: 15,
             playerRank: "Platinum",
@@ -117,7 +114,7 @@ describe("Stats operations", () => {
         expect(updatedStats.props.playerLevel).toBe(15);
         expect(updatedStats.props.playerKills).toBe(75);
         expect(updatedStats.props.playerDeaths).toBe(25);
-        expect(updatedStats.props.killDeathRatio).toBe(3);
+        expect(updatedStats.props.killDeathRatio).toBe(3.0);
         expect(updatedStats.props.playerDamage).toBe(7500);
         expect(updatedStats.props.playerWins).toBe(15);
         expect(updatedStats.props.playerRank).toBe("Platinum");

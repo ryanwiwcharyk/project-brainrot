@@ -29,7 +29,7 @@ export default class StatsHistory {
 		profileId: number): Promise<StatsHistory[] | null> {
 		const connection = await sql.reserve();
 
-		const rows: postgres.RowList<StatsHistoryProps[]> = await connection<StatsHistoryProps[]>`
+		const rows = await connection<StatsHistoryProps[]>`
 			SELECT * FROM
 			session_stats WHERE profile_id = ${profileId}
 		`;

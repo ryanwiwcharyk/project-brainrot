@@ -11,15 +11,12 @@ describe("User CRUD operations", () => {
 
 
     afterEach(async () => {
-        const tables = ["users", "favourites", "game_profile", "platform", "stats", "session_stats"];
-
         try {
-            for (const table of tables) {
-                await sql.unsafe(`DELETE FROM ${table}`);
-                await sql.unsafe(
-                    `ALTER SEQUENCE ${table}_id_seq RESTART WITH 1;`,
-                );
-            }
+
+            await sql.unsafe(
+                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats;`,
+            );
+
         } catch (error) {
             console.error(error);
         }
@@ -31,13 +28,12 @@ describe("User CRUD operations", () => {
             email: props.email || "user@email.com",
             password: props.password || "password",
             createdAt: props.createdAt || createUTCDate(),
-            profilePicture: props.profilePicture,
         });
     };
 
     const createGameProfile = async (props: Partial<ProfileProps> = {}) => {
         return await GameProfile.create(sql, {
-            username: props.username || "gamer123",
+            username: props.username || "Horizon",
             platformId: props.platformId || 1,
             siteUserId: props.siteUserId,
         });
