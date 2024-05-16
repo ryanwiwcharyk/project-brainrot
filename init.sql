@@ -5,24 +5,21 @@ CREATE DATABASE "UserStats";
 
 -- Beware of drop table, when we start creating accounts and saving them we want to remove these
 -- TODO: Remove drop Table
-DROP TABLE IF EXISTS platform;
+DROP TABLE IF EXISTS platform CASCADE;
 CREATE TABLE platform (
     id SERIAL PRIMARY KEY,
-    platform_name VARCHAR(50)
+    platform_name VARCHAR(50) UNIQUE
 );
-INSERT INTO platform (platform_name) VALUES('PC');
-INSERT INTO platform (platform_name) VALUES('XBOX');
-INSERT INTO platform (platform_name) VALUES('PSN');
 
-DROP TABLE IF EXISTS game_profile;
+DROP TABLE IF EXISTS game_profile CASCADE;
 CREATE TABLE game_profile (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100),
     site_user_id INTEGER,
-    platform_id INTEGER REFERENCES platform(id)
+    platform_id INTEGER REFERENCES platform(id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     user_name VARCHAR(100) NOT NULL UNIQUE,
@@ -31,10 +28,10 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     edited_at TIMESTAMP,
     picture_link TEXT,
-    profile_id INTEGER REFERENCES game_profile(id)
+    profile_id INTEGER REFERENCES game_profile(id) ON DELETE CASCADE
 ); 
 
-DROP TABLE IF EXISTS stats;
+DROP TABLE IF EXISTS stats CASCADE;
 CREATE TABLE stats (
     id SERIAL PRIMARY KEY,
     player_level SMALLINT,
@@ -44,28 +41,29 @@ CREATE TABLE stats (
     player_damage INTEGER,
     player_wins SMALLINT,
     player_rank VARCHAR(100),
-    profile_id INTEGER REFERENCES game_profile(id)
+    profile_id INTEGER REFERENCES game_profile(id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS session_stats;
+DROP TABLE IF EXISTS session_stats CASCADE;
 CREATE TABLE session_stats (
     id SERIAL PRIMARY KEY,
     legend_played VARCHAR(100),
     map_played VARCHAR(100),
-    damage_dealt INTEGER
+    damage_dealt INTEGER,
     start_time TIMESTAMP,
     end_time TIMESTAMP,
     session_kills SMALLINT,
-    profile_id INTEGER REFERENCES game_profile(id)
+    profile_id INTEGER REFERENCES game_profile(id) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS favourites;
+DROP TABLE IF EXISTS favourites CASCADE;
 CREATE TABLE favourites (
-    user_id INTEGER REFERENCES users(id),
-    profile_id INTEGER REFERENCES game_profile(id),
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    profile_id INTEGER REFERENCES game_profile(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, profile_id)
 );
 
 
+INSERT INTO platform (platform_name) VALUES ('PC'), ('XBOX'), ('PSN');
 
 

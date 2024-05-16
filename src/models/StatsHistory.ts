@@ -36,7 +36,7 @@ export default class StatsHistory {
 
 		await connection.release();
 
-		if (!rows) {
+		if (rows.count === 0) {
 			return null;
 		}
 

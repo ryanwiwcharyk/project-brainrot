@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { test, describe, expect, afterEach } from "vitest";
+import { test, describe, expect, afterEach, beforeAll } from "vitest";
 import User, { UserProps, DuplicateEmailError, InvalidCredentialsError, DuplicateUsernameError } from "../src/models/User";
 import GameProfile, { ProfileProps } from "../src/models/GameProfile";
 import { createUTCDate } from "../src/utils";
@@ -9,13 +9,29 @@ describe("User CRUD operations", () => {
         database: "UserStats",
     });
 
-
+    // beforeAll(async () => {
+    //     try {
+    //         await sql`
+    //             INSERT INTO platform (platform_name) VALUES ('PC'), ('XBOX'), ('PSN')
+    //             ON CONFLICT (platform_name) DO NOTHING;
+    //         `;
+    //     } catch (error) {
+    //         console.error('Error during beforeAll setup:', error);
+    //     }
+    // });
+    
     afterEach(async () => {
         try {
 
             await sql.unsafe(
-                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats restart identity;`,
+                `TRUNCATE TABLE users, favourites, game_profile, stats, session_stats RESTART IDENTITY CASCADE;`,
             );
+            await sql`
+                TRUNCATE TABLE platform RESTART IDENTITY CASCADE;
+            `;
+            await sql`
+                INSERT INTO platform (platform_name) VALUES ('PC'), ('XBOX'), ('PSN');
+            `;
 
         } catch (error) {
             console.error(error);
@@ -31,13 +47,6 @@ describe("User CRUD operations", () => {
         });
     };
 
-    const createGameProfile = async (props: Partial<ProfileProps> = {}) => {
-        return await GameProfile.create(sql, {
-            username: props.username || "Davydav1919",
-            platformId: props.platformId || 1,
-            siteUserId: props.siteUserId,
-        });
-    };
 
     test("User was created.", async () => {
         const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
@@ -146,7 +155,7 @@ describe("User CRUD operations", () => {
 
     test("User added a game profile to favourites.", async () => {
         const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
-        const profile = await createGameProfile({username: "Davydav1919", platformId: 1});
+        const profile = await GameProfile.create(sql, {username: "Davydav1919", platformId: 1});
 
         await User.FavouritesCreate(sql, user.props.id!, profile.props.id!);
 
@@ -161,7 +170,7 @@ describe("User CRUD operations", () => {
 
     test("User removed a game profile from favourites.", async () => {
         const user = await createUser({ userName: "Davydav", email: "123@gmail.com", password: "123" });
-        const profile = await createGameProfile({username: "Davydav1919", platformId: 1});
+        const profile = await GameProfile.create(sql, {username: "Davydav1919", platformId: 1});
 
         await User.FavouritesCreate(sql, user.props.id!, profile.props.id!);
         await User.FavouritesDelete(sql, user.props.id!, profile.props.id!);

@@ -2,6 +2,7 @@ import postgres from "postgres";
 import { test, describe, expect, afterEach, beforeAll } from "vitest";
 import Stats, { StatsProps } from "../src/models/Stats";
 import { camelToSnake, convertToCase, snakeToCamel } from "../src/utils";
+import Profile from "../src/models/GameProfile";
 
 describe("Stats operations", () => {
     // Set up the connection to the DB.
@@ -9,12 +10,30 @@ describe("Stats operations", () => {
         database: "UserStats",
     });
 
+    // beforeAll(async () => {
+    //     try {
+    //         await sql`
+    //             INSERT INTO platform (platform_name) VALUES ('PC'), ('XBOX'), ('PSN')
+    //             ON CONFLICT (platform_name) DO NOTHING;
+    //         `;
+    //     } catch (error) {
+    //         console.error('Error during beforeAll setup:', error);
+    //     }
+    // });
+
     afterEach(async () => {
         try {
 
             await sql.unsafe(
-                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats restart identity;`,
+                `TRUNCATE TABLE users, favourites, game_profile, stats, session_stats RESTART IDENTITY CASCADE;`,
             );
+            await sql`
+                TRUNCATE TABLE platform RESTART IDENTITY CASCADE;
+            `;
+            await sql`
+                INSERT INTO platform (platform_name) VALUES ('PC'), ('XBOX'), ('PSN');
+            `;
+
 
         } catch (error) {
             console.error(error);
@@ -23,8 +42,9 @@ describe("Stats operations", () => {
 
 
     test("Stats are created and read correctly", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
-        await sql.unsafe(`INSERT INTO game_profile (username, platform_id) VALUES ('Davydav1919', 1)`);
+
+        let profile = await Profile.create(sql, {username: "Davydav1919", platformId: 1})
+        
         const stats1 = await Stats.create(sql, {
             playerLevel: 10,
             playerKills: 50,
@@ -33,7 +53,7 @@ describe("Stats operations", () => {
             playerDamage: 5000,
             playerWins: 10,
             playerRank: "Gold",
-            profileId: 1,
+            profileId: profile.props.id,
         });
         const readStats1 = await Stats.read(sql, 1);
 

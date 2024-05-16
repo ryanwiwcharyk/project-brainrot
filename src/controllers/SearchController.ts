@@ -151,6 +151,7 @@ export default class SearchController {
             }
         }
         catch (error) {
+            console.log(error)
             await res.send({
                 statusCode: StatusCode.BadRequest,
                 message: "Error requesting information. The API might be down",

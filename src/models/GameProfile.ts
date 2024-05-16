@@ -26,16 +26,19 @@ export default class Profile {
 	): Promise<Profile> {
 		const connection = await sql.reserve();
 
-
-		const [row] = await connection<ProfileProps[]>`
-			INSERT INTO game_profile (username, platform_id)
-			VALUES (${props.username}, ${props.platformId})
+		try{
+			
+			const [row] = await connection<ProfileProps[]>`
+			INSERT INTO game_profile
+			${sql(convertToCase(camelToSnake, props))}
 			RETURNING *
 			`;
-
-		await connection.release();
-
-		return new Profile(sql, convertToCase(snakeToCamel, row) as ProfileProps);
+			
+			return new Profile(sql, convertToCase(snakeToCamel, row) as ProfileProps);
+		}
+		finally{
+			await connection.release();
+		}	
 	}
 
 	static async read(sql: postgres.Sql<any>, username: string, platform: string) {

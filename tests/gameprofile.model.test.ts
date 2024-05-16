@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { test, describe, expect, afterEach } from "vitest";
+import { test, describe, expect, afterEach, beforeAll } from "vitest";
 import Profile, { ProfileProps } from "../src/models/GameProfile";
 
 describe("Profile CRUD operations", () => {
@@ -7,6 +7,7 @@ describe("Profile CRUD operations", () => {
     const sql = postgres({
         database: "UserStats",
     });
+
 
     /**
      * Clean up the database after each test. This function deletes all the rows
@@ -16,8 +17,15 @@ describe("Profile CRUD operations", () => {
         try {
 
             await sql.unsafe(
-                `TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats restart identity;`,
+                `TRUNCATE TABLE users, favourites, game_profile, stats, session_stats RESTART IDENTITY CASCADE;`,
             );
+
+            await sql`
+                TRUNCATE TABLE platform RESTART IDENTITY CASCADE;
+            `;
+            await sql`
+                INSERT INTO platform (platform_name) VALUES ('PC'), ('XBOX'), ('PSN');
+            `;
 
         } catch (error) {
             console.error(error);
@@ -32,8 +40,12 @@ describe("Profile CRUD operations", () => {
     };
 
     test("Profile was created.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
-        const profile = await createProfile({ username: "Davydav1919", platformId: 1});
+        const platforms = await sql`
+        SELECT * FROM platform
+    `;
+    expect(platforms.length).toBeGreaterThan(0);
+
+        const profile = await Profile.create(sql, { username: "Davydav1919", platformId: 1});
 
         expect(profile.props.username).toBe("Davydav1919");
         expect(profile.props.platformId).toBe(1);
@@ -41,8 +53,7 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was read.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
-        const profile = await createProfile({ username: "Davydav1919", platformId: 1});
+        const profile = await Profile.create(sql, { username: "Davydav1919", platformId: 1});
 
         const readProfile = await Profile.read(sql, "Davydav1919", "PC");
 
@@ -52,8 +63,7 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was not read with invalid username.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
-        const profile = await createProfile({ username: "Davydav1919", platformId: 1 });
+        const profile = await Profile.create(sql,{ username: "Davydav1919", platformId: 1 });
 
         const readProfile = await Profile.read(sql, "invalidUser", "InvalidPlatform");
 
@@ -62,8 +72,12 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was not read with invalid platform.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
-        const profile = await createProfile({ username: "Davydav1919", platformId: 1 });
+        const platforms = await sql`
+        SELECT * FROM platform
+        `;
+        expect(platforms.length).toBeGreaterThan(0);
+
+        const profile = await Profile.create(sql, { username: "Davydav1919", platformId: 1 });
 
         const readProfile = await Profile.read(sql, "Davydav1919", "InvalidPlatform");
 
@@ -72,7 +86,6 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was linked to site profile.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
 
         await profile.linkToSiteProfile(1);
@@ -81,7 +94,6 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was unlinked from site profile.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
         await profile.linkToSiteProfile(1)
 
@@ -91,7 +103,6 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was retrieved by site user ID.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
         await profile.linkToSiteProfile(1)
 
@@ -102,7 +113,6 @@ describe("Profile CRUD operations", () => {
     });
 
     test("Profile was not retrieved by invalid site user ID.", async () => {
-        await sql.unsafe(`INSERT INTO platform (id, platform_name) VALUES (1, 'PC')`);
         const profile = await createProfile({ username: "Davydav1919", platformId: 1  });
         await profile.linkToSiteProfile(1)
 

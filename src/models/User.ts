@@ -179,7 +179,7 @@ export default class User {
 
 		await connection.release();
 
-		if (!rows) {
+		if (!rows || rows.count === 0) {
 			return null;
 		}
 
@@ -222,12 +222,4 @@ export default class User {
 
 	}
 
-	/*
-	static async GetSiteProfileFromGameProfile (
-		sql: postgres.Sql<any>,
-		gameProfileId: number
-	): Promise<User> {
-
-	}
-	*/
 }
