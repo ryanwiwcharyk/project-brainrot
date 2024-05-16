@@ -35,7 +35,8 @@ test("Profile was found.", async ({ page }) => {
 	await page.goto("/search");
 
     await page.fill('form#search-form input[name="username"]', 'Davydav1919')
-    await page.fill('form#search-form input[name="platform"]', 'PC')
+    await page.selectOption('form#search-form select[name="platform"]', 'PC');
+
 
     expect(await page?.url()).toBe(getPath("/stats/Davydav1919"));
 
@@ -44,7 +45,8 @@ test("Profile was not found due to invalid username.", async ({ page }) => {
 	await page.goto("/search");
 
     await page.fill('form#search-form input[name="username"]', 'Davydav19191919')
-    await page.fill('form#search-form input[name="platform"]', 'PC')
+    await page.selectOption('form#search-form select[name="platform"]', 'PC');
+
 
     expect(await page?.url()).toBe(getPath("search"));
 
@@ -52,11 +54,23 @@ test("Profile was not found due to invalid username.", async ({ page }) => {
 
 	expect(await errorElement?.innerText()).toMatch("Player not found in the API.");
 })
-test("Profile was not found due to invalid username.", async ({ page }) => {
+test("Profile was not found due to empty username.", async ({ page }) => {
 	await page.goto("/search");
 
     await page.fill('form#search-form input[name="username"]', 'Davydav1919')
-    await page.fill('form#search-form input[name="platform"]', 'XBOX')
+    await page.selectOption('form#search-form select[name="platform"]', 'PC');
+
+    expect(await page?.url()).toBe(getPath("search"));
+
+    const errorElement = await page.$("#error");
+
+	expect(await errorElement?.innerText()).toMatch("Player not found in the API.");
+})
+test("Profile was not found due to invalid platform.", async ({ page }) => {
+	await page.goto("/search");
+
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
+    await page.selectOption('form#search-form select[name="platform"]', 'XBOX');
 
     expect(await page?.url()).toBe(getPath("search"));
 
