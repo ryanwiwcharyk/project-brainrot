@@ -26,7 +26,7 @@ test.afterEach(async ({ page }) => {
 	try {
 
 		await sql.unsafe(
-			`TRUNCATE TABLE users, favourites, game_profile, platform, stats, session_stats;`,
+			`TRUNCATE TABLE users, favourites, game_profile, stats, session_stats;`,
 		);
 
 	} catch (error) {
