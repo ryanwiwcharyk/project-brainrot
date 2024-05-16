@@ -46,7 +46,7 @@ export default class SearchController {
         let dark = false
         if (darkmode == "dark") {
             dark = true
-        }        let mapData = await this.GetMapDataFromAPI(req,res)
+        } let mapData = await this.GetMapDataFromAPI(req, res)
 
         if (req.getSearchParams().has("no_user")) {
             await res.send({
@@ -55,6 +55,99 @@ export default class SearchController {
                 payload: {
                     darkmode: dark,
                     error: "You must be logged in and have linked a platform profile to access stats this way.",
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
+                },
+                template: "SearchFormView"
+            });
+        }
+        else if (req.getSearchParams().has("not_found_api")) {
+            await res.send({
+                statusCode: StatusCode.InternalServerError,
+                message: "Search page retrieved",
+                payload: {
+                    darkmode: dark,
+                    error: "Player not found in the API.",
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
+                },
+                template: "SearchFormView"
+            });
+        }
+        else if (req.getSearchParams().has("not_found_linked")) {
+            await res.send({
+                statusCode: StatusCode.InternalServerError,
+                message: "Search page retrieved",
+                payload: {
+                    darkmode: dark,
+                    error: "Could not find current user's stats.",
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
+                },
+                template: "SearchFormView"
+            });
+        } else if (req.getSearchParams().has("not_found")) {
+            await res.send({
+                statusCode: StatusCode.InternalServerError,
+                message: "Search page retrieved",
+                payload: {
+                    darkmode: dark,
+                    error: "Could not find the specified user.",
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
+                },
+                template: "SearchFormView"
+            });
+        }
+        else if (req.getSearchParams().has("api_error")) {
+            await res.send({
+                statusCode: StatusCode.InternalServerError,
+                message: "Search page retrieved",
+                payload: {
+                    darkmode: dark,
+                    error: "The API might be down. Please try again later.",
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
+                },
+                template: "SearchFormView"
+            });
+        } else if (req.getSearchParams().has("platform_error")) {
+            await res.send({
+                statusCode: StatusCode.BadRequest,
+                message: "Search page retrieved",
+                payload: {
+                    darkmode: dark,
+                    error: "Invalid platform specified.",
+                    isLoggedIn: req.session.get("isLoggedIn"),
+                    currentMapName: mapData.current.map,
+                    currentMapTimeRemaining: mapData.current.remainingTimer,
+                    nextMapName: mapData.next.map,
+                    nextMapStart: mapData.next.readableDate_start
+                },
+                template: "SearchFormView"
+            });
+        } else if (req.getSearchParams().has("profile_not_found")) {
+            await res.send({
+                statusCode: StatusCode.InternalServerError,
+                message: "Search page retrieved",
+                payload: {
+                    darkmode: dark,
+                    error: "Could not find current user's profile.",
                     isLoggedIn: req.session.get("isLoggedIn"),
                     currentMapName: mapData.current.map,
                     currentMapTimeRemaining: mapData.current.remainingTimer,
@@ -115,7 +208,7 @@ export default class SearchController {
                     await res.send({
                         statusCode: StatusCode.NotFound,
                         message: "Player not found in API",
-                        redirect: `/search?error=player_not_found`,
+                        redirect: `/search?not_found_api=player_not_found`,
                     });
 
                 } else {
@@ -155,11 +248,11 @@ export default class SearchController {
             await res.send({
                 statusCode: StatusCode.BadRequest,
                 message: "Error requesting information. The API might be down",
-                redirect: `/search?error=try_again`,
+                redirect: `/search?api_error=try_again`,
             });
         }
     }
-getStatisticsPage = async (req: Request, res: Response) => {
+    getStatisticsPage = async (req: Request, res: Response) => {
         let gameProfileId: number = req.session.get("gameProfileId")
         let isFavourite = false;
 
@@ -171,18 +264,18 @@ getStatisticsPage = async (req: Request, res: Response) => {
 
         if (!gameProfileId) {
             let gameProfile: Profile | null = await Profile.getGameProfileFromUserId(this.sql, req.session.get("userId"))
-            if(gameProfile) {
+            if (gameProfile) {
                 gameProfileId = gameProfile.props.id!
             }
             else {
                 await res.send({
                     statusCode: StatusCode.InternalServerError,
                     message: "Error getting user profile.",
-                    redirect: `/search?error=try_again`,
+                    redirect: `/search?not_found_linked=try_again`,
                 });
                 return
             }
-            
+
         }
 
         try {
@@ -193,7 +286,7 @@ getStatisticsPage = async (req: Request, res: Response) => {
                 await res.send({
                     statusCode: StatusCode.NotFound,
                     message: "Could not retrieve user stats.",
-                    redirect: "/search?error=try_again"
+                    redirect: "/search?not_found=try_again"
                 });
                 return
             }
@@ -258,7 +351,7 @@ getStatisticsPage = async (req: Request, res: Response) => {
                     await res.send({
                         statusCode: StatusCode.InternalServerError,
                         message: "Search page retrieved with errors",
-                        redirect: "/search?error=try_again"
+                        redirect: "/search?not_found=try_again"
                     });
                     return
                 }
@@ -270,7 +363,7 @@ getStatisticsPage = async (req: Request, res: Response) => {
             await res.send({
                 statusCode: StatusCode.BadRequest,
                 message: "Error getting user stats.",
-                redirect: "/search?error=try_again"
+                redirect: "/search?not_found=try_again"
             });
         }
 
@@ -308,7 +401,7 @@ getStatisticsPage = async (req: Request, res: Response) => {
                     await res.send({
                         statusCode: StatusCode.NotFound,
                         message: "Profile not found.",
-                        redirect: "/search?error=profile_not_found"
+                        redirect: "/search?profile_not_found=profile_not_found"
                     });
                     return;
                 }
@@ -323,15 +416,15 @@ getStatisticsPage = async (req: Request, res: Response) => {
                 await res.send({
                     statusCode: StatusCode.NotFound,
                     message: "Platform not found.",
-                    redirect: "/search?error=platform_not_found"
+                    redirect: "/search?platform_error=platform_not_found"
                 });
                 return
             }
         } catch (error) {
             await res.send({
-                statusCode: StatusCode.BadRequest,
+                statusCode: StatusCode.InternalServerError,
                 message: "Error getting getting information from the database.",
-                redirect: "/search?error=try_again"
+                redirect: "/search?not_found=try_again"
             });
             return
         }
@@ -355,9 +448,9 @@ getStatisticsPage = async (req: Request, res: Response) => {
             });
             return
         }
-        else if(gameProfile.props.platformId){
+        else if (gameProfile.props.platformId) {
             let platform = await Platform.readFromId(this.sql, gameProfile.props.platformId)
-            if(platform){
+            if (platform) {
                 req.session.set("gameProfileId", gameProfile.props.id);
                 req.session.set("gameProfileUsername", gameProfile.props.username);
                 req.session.set("gameProfilePlatform", platform.props.platformName);
@@ -372,19 +465,19 @@ getStatisticsPage = async (req: Request, res: Response) => {
             await res.send({
                 statusCode: StatusCode.NotFound,
                 message: "Error getting user stats from database.",
-                redirect: "/search?error=try_again"
+                redirect: "/search?not_found=try_again"
             });
             return
         }
         else {
             let favourites: Profile[] | null = await User.FavouritesReadAll(this.sql, req.session.get("userId"));
-                    if (favourites) {
-                        favourites.forEach(element => {
-                            if (element.props.username == gameProfile!.props.username) {
-                                isFavourite = true
-                            }
-                        });
+            if (favourites) {
+                favourites.forEach(element => {
+                    if (element.props.username == gameProfile!.props.username) {
+                        isFavourite = true
                     }
+                });
+            }
             await res.send({
                 statusCode: StatusCode.OK,
                 message: "Stats page retrieved",

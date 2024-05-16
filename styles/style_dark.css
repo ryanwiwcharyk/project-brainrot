@@ -484,3 +484,13 @@
     color: #1797b8;
     cursor: default;
   }
+
+  #stats-history-header {
+    text-align: center;
+  }
+
+  .map-data-image {
+    width: 100%;
+    height: 100%; 
+    object-fit: cover; 
+  }

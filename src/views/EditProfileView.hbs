@@ -8,6 +8,7 @@
     <form id="edit-profile-form" action="/users/edit" method="POST" class="auth-form">
         <h2>{{username}}'s Profile</h2>
         <p id="error">{{error}}</p>
+        <p id="success">{{success}}</p>
         <input type="hidden" name="method" value="PUT">
 
         <label>
@@ -24,8 +25,10 @@
         </label>
 
         {{#if darkmode}}
-        <input type="checkbox" name="darkmode" id="darkmode" checked="true"></input>
+        <div class="checkbox-container">
+            <input type="checkbox" name="darkmode" id="darkmode" checked="true"></input>
         <label for="darkmode">Enable darkmode</label><br>
+        </div>
         {{else}}
         <div class="checkbox-container">
             <input type="checkbox" name="darkmode" id="darkmode" class="form-checkbox"></input>

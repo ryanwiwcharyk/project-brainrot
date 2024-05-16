@@ -8,6 +8,7 @@ import Session from "../auth/Session";
 import User from "../models/User";
 import SessionManager from "../auth/SessionManager";
 import Cookie from "../auth/Cookie";
+import { url } from "inspector";
 
 
 export default class AuthController {
@@ -95,6 +96,19 @@ export default class AuthController {
 				}
 			)
 		}
+		else if (urlSearchParams.has("empty_username")) {
+			await res.send(
+				{
+					statusCode: StatusCode.BadRequest,
+					message: "loaded registration form with errors",
+					template: "RegistrationFormView",
+					payload: {
+						darkmode: dark,
+						error: "Username is required."
+					}
+				}
+			)
+		}
 		else {
 			await res.send(
 				{
@@ -152,6 +166,58 @@ export default class AuthController {
 					payload: {
 						darkmode: dark,
 						error: `Email is required.`
+					}
+				}
+			)
+		}
+		else if (urlSearchParams.has("no_user"))
+		{
+			await res.send(
+				{
+					statusCode: StatusCode.Unauthorized,
+					message: "loaded login form",
+					template: "LoginFormView",
+					payload: {
+						darkmode: dark,
+						error: `Must be logged in to favourite a profile.`
+					}
+				}
+			)
+		}
+		else if (urlSearchParams.has("no_user_edit")){
+			await res.send(
+				{
+					statusCode: StatusCode.Unauthorized,
+					message: "loaded login form",
+					template: "LoginFormView",
+					payload: {
+						darkmode: dark,
+						error: `You must be logged in to edit your account.`
+					}
+				}
+			)
+		}
+		else if (urlSearchParams.has("no_user_link")) {
+			await res.send(
+				{
+					statusCode: StatusCode.Unauthorized,
+					message: "loaded login form",
+					template: "LoginFormView",
+					payload: {
+						darkmode: dark,
+						error: `You must be logged in to claim a profile as your own.`
+					}
+				}
+			)
+		} else if (urlSearchParams.has("no_user_unlink")) {
+			await res.send(
+				{
+					statusCode: StatusCode.Unauthorized,
+					message: "loaded login form",
+					template: "LoginFormView",
+					payload: {
+						darkmode: dark,
+						error: `You must be logged in to unlink your account.`
 					}
 				}
 			)
@@ -229,7 +295,6 @@ export default class AuthController {
 					)
 				}
 			} catch (error) {
-				console.log(error)
 				await res.send(
 					{
 						statusCode: StatusCode.BadRequest,

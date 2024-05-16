@@ -12,10 +12,10 @@ h1{
   align-items: center;
 }
   #nav-header {
-    background-color: #1F2937;
-    padding: 10px 20px; /* Adjust padding as needed */
+    background-color: rgb(2, 2, 48);
+    padding: 10px 20px;
     display: flex;
-    align-items: center; /* Vertically center items */
+    align-items: center; 
     justify-content: space-between;
 
   }
@@ -26,7 +26,7 @@ h1{
   }
   
   .nav-form {
-    display: flex; /* 5 */
+    display: flex;
     
   }
   
@@ -34,8 +34,8 @@ h1{
     background-color: transparent;
         color: #fff;
         border: 2px solid #fff;
-        padding: 8px 15px; /* Adjust padding as needed */
-        margin-left: 10px; /* Adjust margin between buttons as needed */
+        padding: 8px 15px; 
+        margin-left: 10px; 
         border-radius: 5px;
         font-size: 16px;
         font-weight: bold;
@@ -50,7 +50,7 @@ h1{
   }
 
   #logo {
-    width: 30px; /* Adjust width as needed */
+    width: 30px;
     height: auto;
   }
 
@@ -64,7 +64,7 @@ h1{
 }
 
 .favourite-checkbox {
-    display: none; /* Hide the actual checkbox */
+    display: none; 
 }
 
 .favourite-star {
@@ -88,7 +88,6 @@ h1{
 }
 .grid-container {
     display: grid;
-    /* grid-template-columns: repeat(2, 1fr); */
     flex-direction: column;
     grid-gap: 10px;
 }
@@ -124,22 +123,27 @@ h1{
   flex-direction: column;
 }
 
-/* Styling the form headings */
 h2 {
   margin-bottom: 20px;
 }
 
-/* Styling the form labels and inputs */
+
 #error {
   padding: 5px;
   margin: 5px;
   color: red;
 }
 
+#success {
+  padding: 5px;
+  margin: 5px;
+  color: green;
+}
+
 label {
   display: block;
   margin-bottom: 10px;
-  text-align: left; /* Left align form labels */
+  text-align: left; 
 }
 
 .auth-form-input {
@@ -154,7 +158,7 @@ label {
 .favourites-form{
   margin: 3px;
 }
-/* Styling the submit button */
+
 .form-submit-button, .favourites-form {
   background-color: navy;
   color: #fff;
@@ -166,7 +170,6 @@ label {
   transition: background-color 0.3s;
 }
 
-/* Hover effect for the submit button */
 #login-form-submit-button:hover {
   background-color: #001f3f;
 }
@@ -218,12 +221,10 @@ p {
   flex-direction: row;
 }
 
-/* Hover effect for the search input */
 .nav-search-input:hover, .nav-search-input:focus {
   border-color: navy;
 }
 
-/* Global Styles */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -238,7 +239,6 @@ body {
   height: 100vh;
 }
 
-/* Edit Profile Form Styles */
 .edit-profile-form label {
   display: block;
   margin-bottom: 10px;
@@ -255,7 +255,6 @@ body {
   box-sizing: border-box;
 }
 
-/* Sidebar Styles */
 .sidebar {
   position: fixed;
   top: 0;
@@ -286,7 +285,6 @@ body {
   margin: 6px 0;
 }
 
-/* Unlink Form Styles */
 .unlink-form {
   padding: 20px;
   background-color: #f2f2f2;
@@ -335,8 +333,6 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  /* max-width: 600px;
-  min-width: 500px; */
   background-color: #f1f1f1;
   border-radius: 25px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -363,10 +359,10 @@ body {
   border-radius: 0 25px 25px 0;
   outline: none;
   font-size: 16px;
-  background-color: #007bff; /* Blue background */
+  background-color: navy;
   color: #fff;
   cursor: pointer;
-  margin-left: -4px; /* To hide the corner */
+  margin-left: -4px;
 }
 .search-button {
   padding: 10px 20px;
@@ -390,11 +386,16 @@ body {
   gap: 20px;
 }
 
+.map-data-image {
+  width: 100%;
+  height: 100%; 
+  object-fit: cover; 
+}
+
 .map-data .current-map-data,
 .map-data .next-map-data {
   text-align: center;
 }
-
 
 .card {
   display: flex;
@@ -441,7 +442,7 @@ body {
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-weight: 600;
-  color: #1797b8;
+  color: navy;
   cursor: default;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -460,10 +461,9 @@ body {
   font-size: 13px;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-  color: #1797b8;
+  color: navy;
   cursor: default;
 }
-
 
 #left-align{
   text-align: left;
