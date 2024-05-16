@@ -297,7 +297,7 @@ export default class UserController {
 		if (req.body.username) {
 			props.userName = req.body.username
 		}
-		if (req.body.email) {
+		if (req.body.email && req.body.email != req.session.get("email")) {
 			props.email = req.body.email
 		}
 		if (req.body.pic) {
@@ -306,7 +306,7 @@ export default class UserController {
 		if (req.body.password) {
 			props.password = req.body.password
 		}
-		if (!req.body.password && !req.body.pic && !req.body.email && req.body.darkmode) {
+		if (!req.body.password && !req.body.pic && req.body.email != req.session.get("email") && req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "dark"))
 			await res.send({
 				statusCode: StatusCode.OK,
@@ -314,7 +314,7 @@ export default class UserController {
 				redirect: "/users/edit?success=updated_successfully"
 			});
 		}
-		if (!req.body.password && !req.body.pic && !req.body.email && !req.body.darkmode) {
+		if (!req.body.password && !req.body.pic && req.body.email != req.session.get("email") && !req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "light"))
 			await res.send({
 				statusCode: StatusCode.OK,
