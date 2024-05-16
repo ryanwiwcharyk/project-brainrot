@@ -20,13 +20,10 @@
         <label>
             <input type="text" id="password" name="password" placeholder="New password" class="auth-form-input"/>
         </label>
-        <label>
-            <input type="text" id="pic" name="pic" placeholder="Picture URL" class="auth-form-input"/>
-        </label>
 
         {{#if darkmode}}
         <div class="checkbox-container">
-            <input type="checkbox" name="darkmode" id="darkmode" checked="true"></input>
+            <input type="checkbox" name="darkmode" id="darkmode" checked="true" class="form-checkbox"></input>
         <label for="darkmode">Enable darkmode</label><br>
         </div>
         {{else}}

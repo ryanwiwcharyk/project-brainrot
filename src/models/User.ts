@@ -109,14 +109,6 @@ export default class User {
 				throw new DuplicateEmailError();
 			}
 		}
-		if (updateProps.userName) {
-			const userName = await connection<UserProps[]>`
-				SELECT user_name FROM users WHERE user_name = ${updateProps.userName}`;
-			if (userName.count !== 0) {
-				throw new DuplicateUsernameError();
-			}
-		}
-
 
 		const [row] = await connection`
 		UPDATE users

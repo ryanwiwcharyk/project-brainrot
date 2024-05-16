@@ -124,7 +124,7 @@
   
   label {
     display: block;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
     text-align: left;
     color: #B0BEC5;
   }
@@ -194,7 +194,7 @@
   }
   
   p {
-    margin-top: 20px;
+    /* margin-top: 20px; */
     color: #B0BEC5;
   }
   
