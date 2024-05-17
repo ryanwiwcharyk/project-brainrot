@@ -34,21 +34,24 @@ test.afterEach(async ({ page }) => {
 test("Profile was found.", async ({ page }) => {
 	await page.goto("/search");
 
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
     await page.fill('form#search-form input[name="username"]', 'Davydav1919')
-    await page.selectOption('form#search-form select[name="platform"]', 'PC');
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
-
-    expect(await page?.url()).toBe(getPath("/stats/Davydav1919"));
+    expect(await page?.url()).toBe(getPath("stats/Davydav1919"));
 
 })
 test("Profile was not found due to invalid username.", async ({ page }) => {
 	await page.goto("/search");
 
-    await page.fill('form#search-form input[name="username"]', 'Davydav19191919')
-    await page.selectOption('form#search-form select[name="platform"]', 'PC');
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919191919')
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
 
-    expect(await page?.url()).toBe(getPath("search"));
+    expect(await page?.url()).toBe(getPath("search?not_found_api=player_not_found"));
 
     const errorElement = await page.$("#error");
 
@@ -57,10 +60,13 @@ test("Profile was not found due to invalid username.", async ({ page }) => {
 test("Profile was not found due to empty username.", async ({ page }) => {
 	await page.goto("/search");
 
-    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
-    await page.selectOption('form#search-form select[name="platform"]', 'PC');
+    
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', '')
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
-    expect(await page?.url()).toBe(getPath("search"));
+    expect(await page?.url()).toBe(getPath("search?not_found_api=player_not_found"));
 
     const errorElement = await page.$("#error");
 
@@ -69,10 +75,12 @@ test("Profile was not found due to empty username.", async ({ page }) => {
 test("Profile was not found due to invalid platform.", async ({ page }) => {
 	await page.goto("/search");
 
-    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
-    await page.selectOption('form#search-form select[name="platform"]', 'XBOX');
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'XBOX'})
+    await page.fill('form#search-form input[name="username"]', 'adamcarolla16')
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
-    expect(await page?.url()).toBe(getPath("search"));
+    expect(await page?.url()).toBe(getPath("search?not_found_api=player_not_found"));
 
     const errorElement = await page.$("#error");
 

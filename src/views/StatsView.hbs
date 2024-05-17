@@ -41,7 +41,7 @@
             <span>{{rank}}</span>
         </div>
         {{#unless isLinked}}
-        <form method="POST" action="/profile">
+        <form method="POST" action="/profile" id="claim-form">
             <input type="submit" value="Claim Profile" class="form-submit-button">
         </form>
         {{/unless}}
@@ -85,7 +85,10 @@
 </div>
 {{/each}}
 {{else}}
-<p>no session history</p>
+<div class="container">
+    <h2>no session history</h2>
+</div>
+
 {{/if}}
 
 {{> Footer }}
