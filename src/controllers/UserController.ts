@@ -170,7 +170,7 @@ export default class UserController {
 
 				await res.send({
 					statusCode: StatusCode.OK,
-					message: "Profile favourited successfully",
+					message: "Profile unfavourited successfully",
 					redirect: `/stats/${req.session.get("gameProfileUsername")}`,
 				});
 				return
@@ -179,7 +179,7 @@ export default class UserController {
 				await User.FavouritesDelete(this.sql, userId, gameProfileId)
 				await res.send({
 					statusCode: StatusCode.OK,
-					message: "Profile unfavourited successfully",
+					message: "Profile favourited successfully",
 					redirect: `/stats/${req.session.get("gameProfileUsername")}`,
 				});
 				return

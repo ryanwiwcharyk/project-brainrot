@@ -52,17 +52,6 @@ const createUser = async (props: Partial<UserProps> = {}) => {
 	});
 };
 
-const linkProfile = async () => {
-    let profile = await Profile.create(sql, {
-        username: "adamcarolla16",
-        platformId: 1,
-    })
-
-    await profile.linkToSiteProfile(1)
-    return profile
-}
-
-
 test("Logged in user can access edit profile", async ({page}) => {
     const user = await createUser( {email: "test@example.com", password: "pass123"})
 
