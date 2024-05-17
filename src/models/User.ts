@@ -105,7 +105,7 @@ export default class User {
 		if (updateProps.email) {
 			const email = await connection<UserProps[]>`
 				SELECT email FROM users WHERE email = ${updateProps.email}`;
-			if (email.count !== 0) {
+			if (email.count != 0) {
 				throw new DuplicateEmailError();
 			}
 		}
