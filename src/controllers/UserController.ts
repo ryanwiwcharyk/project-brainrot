@@ -264,7 +264,58 @@ export default class UserController {
 				template: "EditProfileView"
 			});
 		}
-		else {
+		else if (messages == "invalid_username"){
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "Edit form retrieved",
+				payload: {
+					error: "Username cannot be empty.",
+					darkmode: dark,
+					pic: pic,
+					isLoggedIn: session.get("isLoggedIn"),
+					email: loggedInUser?.props.email,
+					username: loggedInUser?.props.userName,
+					favourites: favourites,
+					gameProfile: gameProfile
+				},
+				template: "EditProfileView"
+			});
+		}
+		else if (messages == "invalid_email"){
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "Edit form retrieved",
+				payload: {
+					error: "Email cannot be empty.",
+					darkmode: dark,
+					pic: pic,
+					isLoggedIn: session.get("isLoggedIn"),
+					email: loggedInUser?.props.email,
+					username: loggedInUser?.props.userName,
+					favourites: favourites,
+					gameProfile: gameProfile
+				},
+				template: "EditProfileView"
+			});
+		}
+		else if (messages == "already_exists"){
+			await res.send({
+				statusCode: StatusCode.OK,
+				message: "Edit form retrieved",
+				payload: {
+					error: "User with this email already exists.",
+					darkmode: dark,
+					pic: pic,
+					isLoggedIn: session.get("isLoggedIn"),
+					email: loggedInUser?.props.email,
+					username: loggedInUser?.props.userName,
+					favourites: favourites,
+					gameProfile: gameProfile
+				},
+				template: "EditProfileView"
+			});
+		}
+		else{
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "Edit form retrieved",
@@ -297,28 +348,46 @@ export default class UserController {
 		if (req.body.username) {
 			props.userName = req.body.username
 		}
+		else if (req.body.username == ""){
+			await res.send({
+				statusCode: StatusCode.BadRequest,
+				message: "Username cannot be empty.",
+				redirect: "/users/edit?error=invalid_username"
+			});
+			return
+		}
 		if (req.body.email && req.body.email != req.session.get("email")) {
 			props.email = req.body.email
+		}
+		else if(!req.body.email){
+			await res.send({
+				statusCode: StatusCode.BadRequest,
+				message: "Email cannot be empty.",
+				redirect: "/users/edit?error=invalid_email"
+			});
+			return
 		}
 
 		if (req.body.password) {
 			props.password = req.body.password
 		}
-		if (!req.body.password && req.body.email != req.session.get("email") && req.body.darkmode) {
+		if (!req.body.password && req.body.email == req.session.get("email") && req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "dark"))
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
 				redirect: "/users/edit?success=updated_successfully"
 			});
+			return
 		}
-		if (!req.body.password && req.body.email != req.session.get("email") && !req.body.darkmode) {
+		if (!req.body.password && req.body.email == req.session.get("email") && !req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "light"))
 			await res.send({
 				statusCode: StatusCode.OK,
 				message: "User updated successfully!",
 				redirect: "/users/edit?success=updated_successfully"
 			});
+			return
 		}
 		try {
 			let id = session.get("userId")
@@ -341,7 +410,7 @@ export default class UserController {
 					res.setCookie(new Cookie("darkmode", "light"))
 				}
 
-
+				req.session.set("email", user.props.email)
 				await res.send({
 					statusCode: StatusCode.OK,
 					message: "User updated successfully!",
