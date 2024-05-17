@@ -110,6 +110,7 @@ test("Logged in user can favourite a profile", async ({page}) => {
 test("Non-logged in user cannot favourite a profile", async ({page}) => {
     const user = await createUser( {email: "test@example.com", password: "pass123"})
 
+    await page.goto("/search");
     const dropdown = page.locator('#main-selector');
 	dropdown.selectOption({value: 'PC'})
     await page.fill('form#search-form input[name="username"]', 'Davydav1919')
@@ -162,8 +163,11 @@ test("Non-logged in user cannot link a profile", async ({page}) => {
 
     expect(await page?.url()).toBe(getPath("stats/Davydav1919"));
 
-    const favCheckbox = await page.$("form#claim-form .form-submit-button")
-    expect(favCheckbox).toBeFalsy()
+    await page.click("form#claim-form .form-submit-button")
+    expect(await page?.url()).toBe(getPath("login?no_user_link=not_logged_in"));
+
+    const errorElement = await page.$("#error");
+    expect(await errorElement?.innerText()).toMatch("You must be logged in to claim a profile as your own.");
 
 })
 

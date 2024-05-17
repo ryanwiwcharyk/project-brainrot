@@ -349,7 +349,7 @@ export default class UserController {
 		if (req.body.username && req.body.username != loggedInUser?.props.userName) {
 			props.userName = req.body.username
 		}
-		else
+		else if (!req.body.username)
 		{
 			await res.send({
 				statusCode: StatusCode.BadRequest,
