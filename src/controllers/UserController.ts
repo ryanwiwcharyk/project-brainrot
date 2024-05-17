@@ -343,12 +343,14 @@ export default class UserController {
 			});
 			return
 		}
+		let loggedInUser: User | null = await User.read(this.sql, req.session.get("userId"))
 
 		let props: Partial<UserProps> = {}
-		if (req.body.username) {
+		if (req.body.username && req.body.username != loggedInUser?.props.userName) {
 			props.userName = req.body.username
 		}
-		else if (req.body.username == ""){
+		else
+		{
 			await res.send({
 				statusCode: StatusCode.BadRequest,
 				message: "Username cannot be empty.",
@@ -371,7 +373,7 @@ export default class UserController {
 		if (req.body.password) {
 			props.password = req.body.password
 		}
-		if (!req.body.password && req.body.email == req.session.get("email") && req.body.darkmode) {
+		if (!req.body.password && req.body.username == loggedInUser?.props.userName && req.body.email == req.session.get("email") && req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "dark"))
 			await res.send({
 				statusCode: StatusCode.OK,
@@ -380,7 +382,7 @@ export default class UserController {
 			});
 			return
 		}
-		if (!req.body.password && req.body.email == req.session.get("email") && !req.body.darkmode) {
+		if (!req.body.password && req.body.username == loggedInUser?.props.userName && req.body.email == req.session.get("email") && !req.body.darkmode) {
 			res.setCookie(new Cookie("darkmode", "light"))
 			await res.send({
 				statusCode: StatusCode.OK,
