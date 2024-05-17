@@ -8,7 +8,7 @@
             <form method="POST" action="/favourites" id="favourite-form">
                 <input type="hidden" value="{{favouritesPlatform}}" name="favouritesPlatform">
                 {{#if isFavourite}}
-                <input type="checkbox" name="checkbox" id="favourite-checkbox1" class="favourite-checkbox"
+                <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox"
                     onchange="this.form.submit()" checked="{{isFavourite}}">
                 {{else}}
                 <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox"
