@@ -5,29 +5,30 @@ import {
 	createUTCDate,
 	snakeToCamel,
 } from "../utils";
+import { SourceMap } from "module";
 
 export interface StatsProps {
 	id?: number;
-	playerLevel?: string;
-	playerKills?: boolean;
+	playerLevel?: number;
+	playerKills?: number;
 	playerDeaths?: number;
-    killDeathRatio?: number;
-    playerDamage?: number;
-    playerWins?: number;
-    playerRank?: string;
-    profileId?: number;
+	killDeathRatio?: number;
+	playerDamage?: number;
+	playerWins?: number;
+	playerRank?: string;
+	profileId?: number;
 }
 
 export default class Stats {
 	constructor(
 		private sql: postgres.Sql<any>,
 		public props: StatsProps,
-	) {}
+	) { }
 
 	static async create(
 		sql: postgres.Sql<any>,
 		props: StatsProps,
-	) {
+	): Promise<Stats> {
 		const connection = await sql.reserve();
 
 
@@ -39,17 +40,18 @@ export default class Stats {
 
 		await connection.release();
 
+		return new Stats(sql, convertToCase(snakeToCamel, row) as StatsProps);
 	}
 
-    static async read(
-        sql: postgres.Sql<any>, 
-        id: number
-        ): Promise<Stats | null> {
+	static async read(
+		sql: postgres.Sql<any>,
+		id?: number
+	): Promise<Stats | null> {
 		const connection = await sql.reserve();
 
 		const [row] = await connection<StatsProps[]>`
 			SELECT * FROM
-			stats WHERE id = ${id}
+			stats WHERE profile_id = ${id}
 		`;
 
 		await connection.release();
@@ -60,7 +62,7 @@ export default class Stats {
 
 		return new Stats(sql, convertToCase(snakeToCamel, row) as StatsProps);
 	}
-    async update(
+	async update(
 		sql: postgres.Sql<any>,
 		updateProps: Partial<StatsProps>,
 		id: number
@@ -80,6 +82,6 @@ export default class Stats {
 		await connection.release();
 
 		return new Stats(sql, convertToCase(snakeToCamel, row) as StatsProps);
-	
+
 	}
 }

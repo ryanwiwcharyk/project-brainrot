@@ -46,8 +46,28 @@ export default class View {
 
 		// Register a Handlebars helper for formatting the date
 		handlebars.registerHelper("formatDate", function (date) {
-			return formatDateToISO(date); // Format as 'YYYY-MM-DD'
+			const ms = date * 1000
+			const d = new Date(ms);
+
+			// Extract the components of the date
+			const year = d.getFullYear();
+			const month = ('0' + (d.getMonth() + 1)).slice(-2); // Months are zero-based
+			const day = ('0' + d.getDate()).slice(-2);
+			const hours = ('0' + d.getHours()).slice(-2);
+			const minutes = ('0' + d.getMinutes()).slice(-2);
+			const seconds = ('0' + d.getSeconds()).slice(-2);
+
+			// Construct the formatted date string
+			const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+			return formattedDate;
 		});
+
+		handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
+			return (arg1 == arg2);
+		});
+
+
 	}
 
 	/**

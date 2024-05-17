@@ -10,7 +10,7 @@ import GameProfile, { ProfileProps } from "./GameProfile";
 
 export interface UserProps {
 	id?: number;
-	name: string;
+	userName: string;
 	email: string;
 	password: string;
 	createdAt: Date;
@@ -27,6 +27,12 @@ export class DuplicateEmailError extends Error {
 export class InvalidCredentialsError extends Error {
 	constructor() {
 		super("Invalid credentials.");
+	}
+}
+
+export class DuplicateUsernameError extends Error {
+	constructor() {
+		super("This username is taken. Please try again.")
 	}
 }
 
@@ -68,48 +74,55 @@ export default class User {
 
 		props.createdAt = props.createdAt ?? createUTCDate();
 
-		const [row] = await connection<UserProps[]>`
-			SELECT * FROM users
-			WHERE email = ${props.email}
-		`;
+		const email = await connection<UserProps[]>`
+			SELECT email FROM users WHERE email = ${props.email}`;
 
-		if (!row) {
+		const userName = await connection<UserProps[]>`
+			SELECT user_name FROM users WHERE user_name = ${props.userName}`;
+
+		if (email.count !== 0) {
+			throw new DuplicateEmailError();
+		}
+		else if (userName.count !== 0) {
+			throw new DuplicateUsernameError();
+		}
+		else {
 			const [row] = await connection<UserProps[]>`
 			INSERT INTO users
 			${sql(convertToCase(camelToSnake, props))}
-			RETURNING *
-			`;
+			RETURNING *`;
 
 			await connection.release();
 
-			return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
-		}
-		else {
-			throw new DuplicateEmailError();
+			return new User(sql, convertToCase(snakeToCamel, row) as UserProps)
 		}
 
 	}
 	async update(
-		sql: postgres.Sql<any>,
 		updateProps: Partial<UserProps>,
-		id: number
-	): Promise<User> {
-		const connection = await sql.reserve();
+	) {
+		const connection = await this.sql.reserve();
+		if (updateProps.email) {
+			const email = await connection<UserProps[]>`
+				SELECT email FROM users WHERE email = ${updateProps.email}`;
+			if (email.count != 0) {
+				throw new DuplicateEmailError();
+			}
+		}
 
 		const [row] = await connection`
 		UPDATE users
 		SET
-			${sql(convertToCase(camelToSnake, updateProps))}, edited_at = ${createUTCDate()}
+			${this.sql(convertToCase(camelToSnake, updateProps))}, edited_at = ${createUTCDate()}
 		WHERE
-			id = ${id}
+			id = ${this.props.id}
 		RETURNING *
 		`;
 
 
 		await connection.release();
 
-		return new User(sql, convertToCase(snakeToCamel, row) as UserProps);
-
+		this.props = { ...this.props, ...convertToCase(snakeToCamel, row) }
 	}
 
 	static async read(sql: postgres.Sql<any>, id: number) {
@@ -146,16 +159,21 @@ export default class User {
 	static async FavouritesReadAll(
 		sql: postgres.Sql<any>,
 		userId: number
-	): Promise<GameProfile[]> {
+	): Promise<GameProfile[] | null> {
 		const connection = await sql.reserve();
 
 		const rows: postgres.RowList<ProfileProps[]> = await connection<ProfileProps[]>`
-			SELECT gp.*
-			FROM favourites f JOIN game_profile gp
-            WHERE f.user_id = ${userId} AND f.profile_id = gp.id
+			SELECT game_profile.*
+			FROM favourites JOIN game_profile
+			ON favourites.profile_id = game_profile.id
+            WHERE favourites.user_id = ${userId}
 		`;
 
 		await connection.release();
+
+		if (!rows || rows.count === 0) {
+			return null;
+		}
 
 		return rows.map(
 			(row: ProfileProps) =>
@@ -172,7 +190,7 @@ export default class User {
 
 
 		const [row] = await connection<UserProps[]>`
-			INSERT INTO favourites
+			INSERT INTO favourites (user_id, profile_id)
 			VALUES(${userId}, ${profileId})
 		`;
 
@@ -195,4 +213,5 @@ export default class User {
 		await connection.release();
 
 	}
+
 }

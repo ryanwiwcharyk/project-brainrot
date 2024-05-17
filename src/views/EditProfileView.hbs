@@ -1,0 +1,76 @@
+{{> Header }}
+
+
+
+<div class="auth-form-container">
+
+    <!-- Edit Profile Form -->
+    <form id="edit-profile-form" action="/users/edit" method="POST" class="auth-form">
+        <h2>{{username}}'s Profile</h2>
+        <p id="error">{{error}}</p>
+        <p id="success">{{success}}</p>
+        <input type="hidden" name="method" value="PUT">
+
+        <label>
+            <input type="text" id="username" name="username" value="{{ username }}" placeholder="Username" class="auth-form-input" />
+        </label>
+        <label>
+            <input type="text" id="email" name="email" value="{{ email }}" placeholder="Email" class="auth-form-input"/>
+        </label>
+        <label>
+            <input type="text" id="password" name="password" placeholder="New password" class="auth-form-input"/>
+        </label>
+
+        {{#if darkmode}}
+        <div class="checkbox-container">
+            <input type="checkbox" name="darkmode" id="darkmode" checked="true" class="form-checkbox"></input>
+        <label for="darkmode">Enable darkmode</label><br>
+        </div>
+        {{else}}
+        <div class="checkbox-container">
+            <input type="checkbox" name="darkmode" id="darkmode" class="form-checkbox"></input>
+            <label for="darkmode" class="form-label">Darkmode Enabled</label><br>
+        </div>
+
+        {{/if}}
+
+        <button class="form-submit-button">Edit</button>
+    </form>
+
+
+    <div class="edit-form-right-side">
+        <div class="auth-form" id="left-align">
+            <p>Favourites:</p>
+            {{#if favourites}}
+                    {{#each favourites}}
+                            <form action="/redirect/{{props.username}}" method="GET" >
+                                <input type="hidden" name="favouriteUsername" value="{{props.username}}">
+                                <input type="hidden" name="favouritePlatform" value="{{props.platformId}}">
+                                <button type="submit" class="favourites-form" style="width: 100%;">
+                                    {{props.username}}
+                                </button>
+                            </form>
+                    {{/each}}
+            {{else}}
+                <p>No favorites found.</p>
+            {{/if}}
+        </div>
+        {{#if gameProfile}}
+        <div class="auth-form">
+            <form action="/unlink" method="GET" class="unlink-form" id="unlink-form">
+                <label for="platformUsername">Platform Username:</label>
+                <input type="text" id="platformUsername" name="platformUsername"
+                    value="{{gameProfile.props.username}}" class="auth-form-input"/>
+                <input type="submit" value="Unlink platform account" class="form-submit-button">
+            </form>
+        </div>
+        {{else}}
+        <div class="auth-form">
+            <h2>You do not have any linked platform accounts</h2>
+        </div>
+        {{/if}}
+    </div>
+</div>
+
+
+{{> Footer }}
