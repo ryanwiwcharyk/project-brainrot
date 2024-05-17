@@ -8,7 +8,7 @@
             <form method="POST" action="/favourites" id="favourite-form">
                 <input type="hidden" value="{{favouritesPlatform}}" name="favouritesPlatform">
                 {{#if isFavourite}}
-                <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox"
+                <input type="checkbox" name="checkbox" id="favourite-checkbox1" class="favourite-checkbox"
                     onchange="this.form.submit()" checked="{{isFavourite}}">
                 {{else}}
                 <input type="checkbox" name="checkbox" id="favourite-checkbox" class="favourite-checkbox"
@@ -41,7 +41,7 @@
             <span>{{rank}}</span>
         </div>
         {{#unless isLinked}}
-        <form method="POST" action="/profile">
+        <form method="POST" action="/profile" id="claim-form">
             <input type="submit" value="Claim Profile" class="form-submit-button">
         </form>
         {{/unless}}

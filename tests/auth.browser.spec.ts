@@ -92,14 +92,89 @@ test("Non-logged in user cannot access edit profile", async ({page}) => {
 	expect(await errorElement?.innerText()).toMatch("You must be logged in to edit your account.");
 })
 
+test("Logged in user can favourite a profile", async ({page}) => {
+    const user = await createUser( {email: "test@example.com", password: "pass123"})
+
+    await page.goto(`/login`);
+
+    // Fill in the email and password fields
+    await page.fill('form.auth-form input[name="email"]', user.props.email);
+    await page.fill('form.auth-form input[name="password"]', "pass123");
+
+    // Click the login button
+    await page.click("form.auth-form .form-submit-button");
+    expect(await page?.url()).toBe(getPath("search"));
+
+    const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919');
+	await page.press('form#search-form input[name="username"]', 'Enter');
+
+    expect(await page?.url()).toBe(getPath("stats/Davydav1919"));
+
+    const favCheckbox = await page.$("form#favourite-form #favourite-checkbox");
+    expect(favCheckbox).toBeTruthy();
+    
+
+})
+
 test("Non-logged in user cannot favourite a profile", async ({page}) => {
     const user = await createUser( {email: "test@example.com", password: "pass123"})
 
-    // Fill in the email and password fields
-    expect(await page?.url()).toBe(getPath("search"));
-    const profile = await linkProfile();
-    await page.click("form.nav-form #linked-stats");
+    const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
-    expect(await page?.url()).toBe(getPath(`stats/${profile.props.username}`));
+    expect(await page?.url()).toBe(getPath("stats/Davydav1919"));
+
+    const favCheckbox = await page.$("form.favourite-form #favourite-checkbox")
+    expect(favCheckbox).toBeFalsy()
+
+})
+
+
+test("Logged in user can link a profile", async ({page}) => {
+    const user = await createUser( {email: "test@example.com", password: "pass123"})
+
+    await page.goto(`/login`);
+
+    // Fill in the email and password fields
+    await page.fill('form.auth-form input[name="email"]', user.props.email);
+    await page.fill('form.auth-form input[name="password"]', "pass123");
+
+    // Click the login button
+    await page.click("form.auth-form .form-submit-button");
+    const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
+	await page.press('form#search-form input[name="username"]', 'Enter');
+
+    expect(await page?.url()).toBe(getPath("stats/Davydav1919"));
+
+    await page.click("form#claim-form .form-submit-button");
+
+    await page.goto("users/edit")
+
+    const unlinkForm = await page.$("form#unlink-form")
+    expect(unlinkForm).toBeTruthy();
+
+})
+
+test("Non-logged in user cannot link a profile", async ({page}) => {
+    const user = await createUser( {email: "test@example.com", password: "pass123"})
+
+    await page.goto("/search");
+
+    const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
+	await page.press('form#search-form input[name="username"]', 'Enter');
+
+    expect(await page?.url()).toBe(getPath("stats/Davydav1919"));
+
+    const favCheckbox = await page.$("form#claim-form .form-submit-button")
+    expect(favCheckbox).toBeFalsy()
+
 })
 

@@ -38,17 +38,21 @@ test.afterEach(async ({ page }) => {
 test("Profile was found.", async ({ page }) => {
 	await page.goto("/search");
 
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
     await page.fill('form#search-form input[name="username"]', 'Davydav1919')
-    await page.fill('form#search-form input[name="platform"]', 'PC')
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
-    expect(await page?.url()).toBe(getPath("/stats/Davydav1919"));
+    expect(await page?.url()).toBe(getPath("stats/Davydav1919"));
 
 })
 test("Profile was not found due to invalid username.", async ({ page }) => {
 	await page.goto("/search");
 
-    await page.fill('form#search-form input[name="username"]', 'Davydav19191919')
-    await page.fill('form#search-form input[name="platform"]', 'PC')
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
     expect(await page?.url()).toBe(getPath("search"));
 
@@ -59,8 +63,10 @@ test("Profile was not found due to invalid username.", async ({ page }) => {
 test("Profile was not found due to invalid username.", async ({ page }) => {
 	await page.goto("/search");
 
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
     await page.fill('form#search-form input[name="username"]', 'Davydav1919')
-    await page.fill('form#search-form input[name="platform"]', 'XBOX')
+	await page.press('form#search-form input[name="username"]', 'Enter');
 
     expect(await page?.url()).toBe(getPath("search"));
 
