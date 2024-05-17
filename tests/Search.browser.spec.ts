@@ -12,10 +12,6 @@ const logout = async (page: Page) => {
 	await page.goto("/logout");
 };
 
-test.beforeEach(async () => {
-	// Anything you want to do before each test runs?
-});
-
 /**
  * Clean up the database after each test. This function deletes all the rows
  * from the todos and subtodos tables and resets the sequence for each table.
@@ -51,24 +47,40 @@ test("Profile was not found due to invalid username.", async ({ page }) => {
 
 	const dropdown = page.locator('#main-selector');
 	dropdown.selectOption({value: 'PC'})
-    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
+    await page.fill('form#search-form input[name="username"]', 'Davydav1919191919')
 	await page.press('form#search-form input[name="username"]', 'Enter');
 
-    expect(await page?.url()).toBe(getPath("search"));
+
+    expect(await page?.url()).toBe(getPath("search?not_found_api=player_not_found"));
 
     const errorElement = await page.$("#error");
 
 	expect(await errorElement?.innerText()).toMatch("Player not found in the API.");
 })
-test("Profile was not found due to invalid username.", async ({ page }) => {
+test("Profile was not found due to empty username.", async ({ page }) => {
+	await page.goto("/search");
+
+    
+	const dropdown = page.locator('#main-selector');
+	dropdown.selectOption({value: 'PC'})
+    await page.fill('form#search-form input[name="username"]', '')
+	await page.press('form#search-form input[name="username"]', 'Enter');
+
+    expect(await page?.url()).toBe(getPath("search?not_found_api=player_not_found"));
+
+    const errorElement = await page.$("#error");
+
+	expect(await errorElement?.innerText()).toMatch("Player not found in the API.");
+})
+test("Profile was not found due to invalid platform.", async ({ page }) => {
 	await page.goto("/search");
 
 	const dropdown = page.locator('#main-selector');
-	dropdown.selectOption({value: 'PC'})
-    await page.fill('form#search-form input[name="username"]', 'Davydav1919')
+	dropdown.selectOption({value: 'XBOX'})
+    await page.fill('form#search-form input[name="username"]', 'adamcarolla16')
 	await page.press('form#search-form input[name="username"]', 'Enter');
 
-    expect(await page?.url()).toBe(getPath("search"));
+    expect(await page?.url()).toBe(getPath("search?not_found_api=player_not_found"));
 
     const errorElement = await page.$("#error");
 
